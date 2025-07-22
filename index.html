@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASHI PLAYER - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
+        
+        <p>Insira sua lista M3U / M3U8 para começar.</p>
+        
+        <input type="text" id="urlInput" placeholder="URL da lista M3U">
+        
+        <div class="separator">ou</div>
+        
+        <label for="fileInput" class="file-label">
+            <span id="file-name">Selecionar arquivo .m3u local</span>
+            <input type="file" id="fileInput" accept=".m3u,.m3u8">
+        </label>
+        
+        <button id="loadButton">Carregar Player</button>
+        <div id="error-message" class="error"></div>
+    </div>
+    <script src="login.js"></script>
+</body>
+</html>
