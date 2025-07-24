@@ -1,0 +1,79 @@
+/* /css/filmes.css */
+/* Estilos específicos para a página de filmes aqui. */
+
+/* Estilos para o contêiner dos filtros de categoria */
+#movie-category-filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+    gap: 15px; /* Espaçamento entre os botões */
+    padding: 30px 0 25px 0; /* Espaçamento superior e inferior */
+    border-bottom: 1px solid var(--border-color); /* Linha divisória */
+    margin-bottom: 25px; /* Espaçamento abaixo dos filtros */
+}
+
+/* Estilos para os botões de filtro */
+.filter-button {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    flex-shrink: 0; /* Impede que os botões encolham */
+}
+
+.filter-button:hover {
+    border-color: var(--yashi-cyan);
+    color: var(--yashi-cyan);
+    transform: translateY(-2px); /* Efeito de elevação sutil */
+}
+
+.filter-button.active {
+    background-color: var(--yashi-cyan);
+    border-color: var(--yashi-cyan);
+    color: var(--background-color);
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 240, 240, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Estilos para cards de temporada, caso ainda existam ou sejam introduzidos */
+.season-card {
+    min-height: 120px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--yashi-cyan);
+}
+.season-card:hover { background-color: var(--yashi-cyan-glow); }
+.season-card .card-img { display: none; }
+.season-card .card-title { font-size: 18px; font-weight: bold; color: white; white-space: normal; }
+
+/* Responsividade para os filtros */
+@media (max-width: 768px) {
+    #movie-category-filters {
+        padding: 20px 0 15px 0;
+        gap: 10px;
+    }
+    .filter-button {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    #movie-category-filters {
+        justify-content: flex-start; /* Alinha à esquerda em telas muito pequenas */
+        overflow-x: auto; /* Adiciona scroll horizontal se necessário */
+        white-space: nowrap; /* Impede quebra de linha dos botões */
+        padding-bottom: 10px;
+    }
+    .filter-button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

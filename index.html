@@ -4,26 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YASHI PLAYER - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index_home.css">
 </head>
 <body class="login-body">
     <div class="login-container">
-        <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
-        
-        <p>Insira sua lista M3U / M3U8 para começar.</p>
-        
-        <input type="text" id="urlInput" placeholder="URL da lista M3U">
-        
-        <div class="separator">ou</div>
-        
-        <label for="fileInput" class="file-label">
-            <span id="file-name">Selecionar arquivo .m3u local</span>
-            <input type="file" id="fileInput" accept=".m3u,.m3u8">
-        </label>
-        
-        <button id="loadButton">Carregar Player</button>
-        <div id="error-message" class="error"></div>
+        <div id="login-form">
+            <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
+            <p>Insira sua lista M3U / M3U8 para começar.</p>
+            <input type="text" id="urlInput" placeholder="URL da lista M3U">
+            <div class="separator">ou</div>
+            <label for="fileInput" class="file-label">
+                <span id="file-name">Selecionar arquivo .m3u</span>
+                <input type="file" id="fileInput" accept=".m3u,.m3u8">
+            </label>
+            <button id="loadButton">Carregar Player</button>
+            <div class="copyright-notice">
+                Este aplicativo é um reprodutor de mídia e não fornece ou armazena conteúdo. Todo o conteúdo é carregado a partir das listas fornecidas pelo próprio usuário.
+            </div>
+            <div id="error-message"></div>
+        </div>
+        <div id="login-loader">
+            <div class="loading-yashi">
+                <span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span>
+            </div>
+            <div id="loading-status">Iniciando...</div>
+        </div>
     </div>
-    <script src="login.js"></script>
+    
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>

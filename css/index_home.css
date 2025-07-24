@@ -1,0 +1,312 @@
+/* /css/index_home.css */
+
+/* Cores para o efeito de vidro (Login) e Home */
+:root {
+    /* As cores agora são herdadas do base.css, mas podemos redefinir se necessário. */
+    /* Para garantir consistência, vamos usar as variáveis globais. */
+    --glass-bg: rgba(22, 27, 34, 0.6);
+    --glass-border: rgba(0, 240, 240, 0.3); /* Ciano Neon com transparência */
+    --home-bg-dark: #0d1117;
+    --home-bg-light: #161b22;
+}
+
+/* --- ESTILOS DA PÁGINA DE LOGIN --- */
+.login-body {
+    background: linear-gradient(135deg, var(--background-color) 0%, #080a0d 100%);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-body::before {
+    content: none;
+}
+
+.login-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    z-index: 2;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    min-height: 350px; /* Garante uma altura mínima para o container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#login-form {
+    width: 100%; /* Garante que o formulário ocupe o espaço do container */
+}
+
+.login-logo {
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 20px;
+}
+.login-container p {
+    color: var(--text-secondary-color);
+    margin-bottom: 30px;
+    margin-top: 0;
+}
+.login-container input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: rgba(13, 17, 23, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 16px;
+}
+.separator { margin: 15px 0; color: var(--text-secondary-color); }
+.file-label {
+    display: block;
+    padding: 12px;
+    background: rgba(13, 17, 23, 0.8);
+    border: 2px dashed var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.file-label:hover { background-color: var(--surface-color); border-color: var(--yashi-cyan); }
+input[type="file"] { display: none; }
+#loadButton {
+    width: 100%;
+    padding: 15px;
+    margin-top: 25px;
+    border: none;
+    border-radius: 50px;
+    background: var(--yashi-cyan);
+    color: var(--background-color);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+#loadButton:hover { background: var(--yashi-cyan-glow); color: var(--background-color); transform: scale(1.02); }
+
+.copyright-notice {
+    font-size: 11px; /* Reduzido o tamanho da fonte */
+    color: var(--text-secondary-color);
+    margin-top: 20px;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+    opacity: 0.7; /* Reduzida a opacidade para ser menos visível */
+}
+
+#error-message { 
+    color: #ff7b72; 
+    margin-top: 15px; 
+    height: 20px; 
+    font-weight: bold; 
+}
+
+/* --- ESTILOS DO LOADER (TELA DE CARREGAMENTO) --- */
+#login-loader {
+    display: none; /* Inicia oculto */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Estilos visuais removidos para que ele não crie uma nova caixa, 
+       apenas organize o conteúdo dentro do .login-container */
+}
+
+#loading-status { color: var(--text-secondary-color); font-size: 16px; }
+
+
+/* --- NOVOS ESTILOS DA PÁGINA HOME --- */
+.home-body {
+    /* Combina o padrão de linhas sutis com o gradiente de fundo */
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.02),
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px,
+            transparent 30px
+        ),
+        linear-gradient(135deg, var(--home-bg-dark), var(--home-bg-light));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.home-container {
+    width: 100%;
+    max-width: 900px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-layout {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    align-items: stretch;
+}
+
+.home-nav {
+    flex: 3;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.nav-button {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+    padding: 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.2s, background-color 0.2s;
+    border: none;
+    min-height: 150px;
+}
+
+.nav-button:hover {
+    transform: scale(1.03);
+    background-color: var(--yashi-cyan-glow);
+}
+
+.nav-button i {
+    font-size: 40px;
+    color: var(--background-color);
+}
+
+.nav-button span {
+    font-size: 18px;
+    color: var(--background-color);
+    font-weight: 500;
+}
+
+.actions-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: flex-start; /* Alinhado ao topo */
+}
+
+/* AJUSTADO: Botões de Ação Vazados */
+.action-button {
+    background-color: transparent;
+    border: 2px solid var(--yashi-cyan);
+    color: var(--yashi-cyan);
+    padding: 0 20px; /* Espaçamento interno */
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinha o conteúdo à esquerda */
+    gap: 15px;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+    cursor: pointer;
+    width: 100%;
+    height: 60px;
+    box-sizing: border-box; /* Garante que o padding não altere a largura final */
+}
+
+.action-button:hover {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+}
+
+.action-button i {
+    font-size: 20px;
+    width: 25px;
+    text-align: center;
+}
+
+.action-button span {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.home-logo-small {
+    max-width: 160px; /* Aumentado de 120px para 160px */
+    height: auto;
+    margin-top: auto; /* Empurra o logo para o final */
+    align-self: center; /* Centraliza o logo na coluna */
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.home-logo-small:hover {
+    opacity: 1;
+}
+
+/* NOVO ESTILO PARA O AVISO DE COPYRIGHT */
+.footer-notice {
+    margin-top: 30px; /* Espaçamento do conteúdo acima */
+    font-size: 12px;
+    color: var(--text-secondary-color);
+    text-align: center;
+    opacity: 0.6;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+    .home-nav {
+        order: 1;
+    }
+    .actions-column {
+        order: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .action-button {
+        flex-grow: 1;
+        justify-content: center;
+    }
+    .home-logo-small {
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-nav {
+        grid-template-columns: 1fr;
+    }
+    .actions-column {
+        flex-direction: column;
+        align-items: center;
+    }
+    .action-button {
+        justify-content: flex-start;
+    }
+    .home-logo-small {
+        margin-top: auto;
+    }
+}

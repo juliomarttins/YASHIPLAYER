@@ -1,0 +1,13 @@
+/* /css/series.css */
+/* Estilos específicos para a página de séries aqui. */
+
+.season-card {
+    min-height: 120px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--yashi-cyan);
+}
+.season-card:hover { background-color: var(--yashi-cyan-glow); }
+.season-card .card-img { display: none; }
+.season-card .card-title { font-size: 18px; font-weight: bold; color: white; white-space: normal; }
