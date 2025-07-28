@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Presença - Ravi no Mundo Bita</title>
+    <!-- Importando a fonte do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ARQUIVO: style.css (incorporado no HTML para simplicidade) --- */
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .cenario {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #87CEEB 0%, #B2EBF2 100%);
+            overflow: hidden;
+        }
+        
+        .sol {
+            position: absolute;
+            top: 5vh;
+            left: 5vw;
+            width: clamp(80px, 12vw, 120px);
+            height: clamp(80px, 12vw, 120px);
+            background-color: #FFD700;
+            border-radius: 50%;
+            z-index: 1;
+            animation: brilhoSol 3s ease-in-out infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes brilhoSol {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px 8px #FFD700, 0 0 50px 15px rgba(255, 223, 0, 0.4);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 60px 25px #FFD700, 0 0 100px 45px rgba(255, 223, 0, 0.7);
+            }
+        }
+
+        .rosto-sol {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sol .olho {
+            position: absolute;
+            top: 30%;
+            width: 12%;
+            height: 18%;
+            background-color: #443322;
+            border-radius: 50%;
+        }
+
+        .sol .olho:first-of-type {
+            left: 28%;
+        }
+
+        .sol .olho:last-of-type {
+            right: 28%;
+        }
+
+        .sol .boca {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 20%;
+            border-bottom: 5px solid #443322;
+            border-radius: 0 0 100% 100%;
+            box-sizing: border-box;
+        }
+        
+        .conteudo-central {
+            position: absolute;
+            top: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .header-imagem {
+            width: 68%; 
+            max-width: 340px; 
+            height: auto;
+        }
+
+        .form-confirmacao {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-confirmacao label {
+            color: #005A7A;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 0 white;
+        }
+
+        .form-confirmacao input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 3px solid #00A9E0;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-botoes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .botao-form {
+            padding: 12px 25px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            text-transform: uppercase;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .botao-form.confirmar { background-color: #00A9E0; }
+        .botao-form.negar { background-color: #D90077; }
+        
+        .botoes-navegacao {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .botao-nav {
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .botao-nav:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .botao-home { background-color: #00A9E0; }
+        .botao-home svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+        .botao-local { 
+            background-color: #D90077;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 12px;
+            width: auto;
+            height: auto;
+            border-radius: 50px;
+            min-width: 120px;
+        }
+        
+        .grama-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh;
+            z-index: 10;
+        }
+
+        .grama-svg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes balancoSuave {
+            0%, 100% { transform: rotateZ(0deg); }
+            50% { transform: rotateZ(3deg); }
+        }
+
+        .lamina {
+            transform-origin: bottom center;
+            animation: balancoSuave 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes moverNuvem {
+            0% { transform: translateX(-250px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .nuvem {
+            position: absolute;
+            width: 220px;
+            height: 70px;
+            background: #fcfcfc;
+            border-radius: 100px;
+            z-index: 5;
+            opacity: 0.95;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .nuvem::before, .nuvem::after {
+            content: '';
+            position: absolute;
+            background: #fcfcfc;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .nuvem::before { width: 120px; height: 120px; top: -60px; left: 20px; }
+        .nuvem::after { width: 90px; height: 90px; top: -35px; right: 30px; }
+        
+        .nuvem1 { top: 20%; transform: scale(0.9); animation: moverNuvem 40s linear infinite -2s; }
+        .nuvem2 { top: 35%; transform: scale(1.2); animation: moverNuvem 30s linear infinite -15s; }
+        .nuvem3 { top: 55%; transform: scale(0.7); animation: moverNuvem 55s linear infinite -25s; }
+
+        .footer-creditos {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 11;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .footer-creditos a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        #mensagem-feedback {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #005A7A;
+            text-shadow: 1px 1px 0 white;
+            display: none; /* Começa escondido */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="cenario">
+        
+        <div class="sol">
+            <div class="rosto-sol">
+                <div class="olho"></div>
+                <div class="olho"></div>
+                <div class="boca"></div>
+            </div>
+        </div>
+
+        <!-- Container do Conteúdo Central -->
+        <div class="conteudo-central">
+            <img src="top.png" alt="Ravi no Mundo Bita" class="header-imagem">
+            
+            <form id="confirmationForm" class="form-confirmacao">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+                
+                <label for="quantidade">Quantidade de pessoas na família:</label>
+                <input type="number" id="quantidade" name="quantidade" min="1" required>
+
+                <div class="form-botoes">
+                    <button type="submit" name="status" value="Confirmado" class="botao-form confirmar">Confirmo Presença</button>
+                    <button type="submit" name="status" value="Negado" class="botao-form negar">Infelizmente não poderei ir</button>
+                </div>
+            </form>
+            
+            <p id="mensagem-feedback"></p>
+            
+            <div class="botoes-navegacao">
+                <a href="index.html" class="botao-nav botao-home" title="Voltar para o Início">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </a>
+                <a href="#" class="botao-nav botao-local">Local da Festa</a>
+            </div>
+        </div>
+
+        <div class="nuvem nuvem1"></div>
+        <div class="nuvem nuvem2"></div>
+        <div class="nuvem nuvem3"></div>
+
+        <div class="grama-container">
+            <svg class="grama-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path d="M0,120 L1440,120 L1440,60 C1200,80 900,30 600,60 C300,90 100,80 0,60 Z" fill="#4CAF50"></path>
+                <g fill="#388E3C">
+                    <path class="lamina" d="M100 80 Q 102 60 104 80z"></path>
+                    <path class="lamina" d="M180 78 Q 183 54 186 78z" style="transform: scale(0.8)"></path>
+                    <path class="lamina" d="M250 75 Q 252 59 254 75z" style="transform: scale(1.1)"></path>
+                </g>
+            </svg>
+            <div class="footer-creditos">
+                Desenvolvido por <a href="https://wa.me/5562998413382" target="_blank">Julio Martins</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script para enviar dados para o WhatsApp -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('confirmationForm');
+            const feedbackMessage = document.getElementById('mensagem-feedback');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const statusButton = e.submitter;
+                const status = statusButton.value;
+                const nome = document.getElementById('nome').value;
+                const quantidade = document.getElementById('quantidade').value;
+                const numeroTelefone = '5562994263011'; // Seu número de telefone aqui
+
+                let mensagem = '';
+
+                if (status === 'Confirmado') {
+                    mensagem = `🎉 Olá! Acabei de confirmar presença na festa de 1 aninho do Ravi! 🎂\n\n*Nome:* ${nome}\n*Quantidade de pessoas:* ${quantidade}\n\nMal podemos esperar para comemorar com vocês! 🥳`;
+                } else {
+                    mensagem = `😥 Olá! Com muita pena, informo que não poderemos comparecer à festa de 1 aninho do Ravi. 💔\n\n*Nome:* ${nome}\n\nAgradecemos muito o convite e desejamos uma festa incrível! 🎉`;
+                }
+
+                // Codifica a mensagem para a URL do WhatsApp
+                const whatsappURL = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(mensagem)}`;
+
+                // Desabilita os botões e mostra feedback
+                form.querySelectorAll('button').forEach(button => button.disabled = true);
+                feedbackMessage.textContent = 'Redirecionando para o WhatsApp...';
+                feedbackMessage.style.display = 'block';
+
+                // Redireciona para o WhatsApp
+                window.open(whatsappURL, '_blank');
+            });
+        });
+    </script>
+
+</body>
+</html>

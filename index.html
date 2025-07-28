@@ -217,6 +217,13 @@
             animation: textoBrilhante 2.5s ease-in-out infinite;
             margin-top: 10px;
         }
+        
+        .info-texto .data-festa {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            color: #D90077;
+            text-shadow: 2px 2px 0px white;
+            margin-top: 15px;
+        }
 
         .botoes-container {
             display: flex;
@@ -321,7 +328,7 @@
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px; /* Tamanho aumentado */
             color: rgba(255, 255, 255, 0.6);
             z-index: 11;
             font-family: Arial, sans-serif;
@@ -334,15 +341,14 @@
             font-weight: bold;
         }
 
-        /* --- NOVO: Media Query para responsividade do pop-up --- */
         @media (max-width: 600px) {
             .popup-content h2 {
-                font-size: 1.8rem; /* Tamanho do título menor para celular */
+                font-size: 1.8rem;
             }
 
             .popup-content button {
-                font-size: 1rem; /* Tamanho do botão menor para celular */
-                padding: 12px 24px; /* Preenchimento menor para celular */
+                font-size: 1rem;
+                padding: 12px 24px;
             }
         }
 
@@ -383,11 +389,12 @@
             
             <div class="info-texto">
                 <p class="convite-texto">Prepare o bigode e a animação: o Mundo do Ravi está em festa e a aventura começa agora! Confirme sua presença e embarque nesse universo encantado com a gente!</p>
-                <div class="aniversario-texto">meu primeiro aniversario 🎈🎈<br>( 01 aninho)</div>
+                <div class="aniversario-texto">meu primeiro aniversario 🎈🎈 (01 aninho)</div>
+                <p class="data-festa">Data: 16/08/25 (SAB) - 15:00h</p>
             </div>
             
             <div class="botoes-container">
-                <a href="#" class="botao botao-confirmar">Confirmar Presença</a>
+                <a href="confirmar.html" class="botao botao-confirmar">Confirmar Presença</a>
                 <a href="#" class="botao botao-local">Local da Festa</a>
             </div>
         </div>
