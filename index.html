@@ -1,43 +1,476 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YASHI PLAYER - Login</title>
+    <title>Ravi no Mundo Bita</title>
+    <!-- Importando a fonte do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/index_home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ARQUIVO: style.css (incorporado no HTML para simplicidade) --- */
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .cenario {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #87CEEB 0%, #B2EBF2 100%);
+            overflow: hidden;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #00A9E0, #D90077);
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 90%;
+            width: 400px;
+            color: white;
+            border: 4px solid white;
+        }
+
+        .popup-content h2 {
+            font-size: 2.5rem;
+            margin-top: 0;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .popup-content button {
+            background-color: white;
+            color: #D90077;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        .popup-content button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .music-player-container {
+            position: absolute;
+            top: 3vh;
+            right: 2vw;
+            z-index: 30;
+        }
+
+        .player-button {
+            background-color: #D90077;
+            border: 2px solid white;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        
+        .player-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .sol {
+            position: absolute;
+            top: 5vh;
+            left: 5vw;
+            width: clamp(80px, 12vw, 120px);
+            height: clamp(80px, 12vw, 120px);
+            background-color: #FFD700;
+            border-radius: 50%;
+            z-index: 1;
+            animation: brilhoSol 3s ease-in-out infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes brilhoSol {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px 8px #FFD700, 0 0 50px 15px rgba(255, 223, 0, 0.4);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 60px 25px #FFD700, 0 0 100px 45px rgba(255, 223, 0, 0.7);
+            }
+        }
+
+        .rosto-sol {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sol .olho {
+            position: absolute;
+            top: 30%;
+            width: 12%;
+            height: 18%;
+            background-color: #443322;
+            border-radius: 50%;
+        }
+
+        .sol .olho:first-of-type {
+            left: 28%;
+        }
+
+        .sol .olho:last-of-type {
+            right: 28%;
+        }
+
+        .sol .boca {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 20%;
+            border-bottom: 5px solid #443322;
+            border-radius: 0 0 100% 100%;
+            box-sizing: border-box;
+        }
+        
+        .conteudo-central {
+            position: absolute;
+            top: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 20;
+        }
+
+        .header-imagem {
+            width: 68%; 
+            max-width: 340px; 
+            height: auto;
+        }
+
+        .info-texto {
+            text-align: center;
+            color: #005A7A;
+        }
+
+        .info-texto .convite-texto {
+            font-size: clamp(1rem, 2.8vw, 1.3rem);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        @keyframes textoBrilhante {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 2px 2px 0px white;
+            }
+            50% {
+                transform: scale(1.03);
+                text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.9);
+            }
+        }
+        
+        .info-texto .aniversario-texto {
+            font-size: clamp(1.2rem, 3.5vw, 1.4rem);
+            color: #00A9E0;
+            text-shadow: 2px 2px 0px white;
+            line-height: 1.2;
+            animation: textoBrilhante 2.5s ease-in-out infinite;
+            margin-top: 10px;
+        }
+
+        .botoes-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .botao {
+            padding: 12px 25px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            text-transform: uppercase;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            white-space: nowrap;
+            width: 80%;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .botao:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .botao-confirmar { background-color: #00A9E0; }
+        .botao-local { background-color: #D90077; }
+
+        .grama-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh;
+            z-index: 10;
+        }
+
+        .grama-svg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes balancoSuave {
+            0%, 100% { transform: rotateZ(0deg); }
+            50% { transform: rotateZ(3deg); }
+        }
+
+        .lamina {
+            transform-origin: bottom center;
+            animation: balancoSuave 4s ease-in-out infinite alternate;
+        }
+
+        .lamina:nth-of-type(2n) { animation-duration: 3.5s; }
+        .lamina:nth-of-type(3n) { animation-delay: -0.5s; }
+        .lamina:nth-of-type(4n) { animation-duration: 4.5s; }
+        .lamina:nth-of-type(5n) { animation-delay: -1s; }
+
+
+        @keyframes moverNuvem {
+            0% { transform: translateX(-250px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .nuvem {
+            position: absolute;
+            width: 220px;
+            height: 70px;
+            background: #fcfcfc;
+            border-radius: 100px;
+            z-index: 5;
+            opacity: 0.95;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .nuvem::before, .nuvem::after {
+            content: '';
+            position: absolute;
+            background: #fcfcfc;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .nuvem::before { width: 120px; height: 120px; top: -60px; left: 20px; }
+        .nuvem::after { width: 90px; height: 90px; top: -35px; right: 30px; }
+        
+        .nuvem1 { top: 20%; transform: scale(0.9); animation: moverNuvem 40s linear infinite -2s; }
+        .nuvem2 { top: 35%; transform: scale(1.2); animation: moverNuvem 30s linear infinite -15s; }
+        .nuvem3 { top: 55%; transform: scale(0.7); animation: moverNuvem 55s linear infinite -25s; }
+        .nuvem4 { top: 65%; transform: scale(0.5); animation: moverNuvem 70s linear infinite -5s; }
+        .nuvem5 { top: 15%; transform: scale(0.4); animation: moverNuvem 80s linear infinite -40s; }
+
+        .footer-creditos {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 11;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .footer-creditos a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* --- NOVO: Media Query para responsividade do pop-up --- */
+        @media (max-width: 600px) {
+            .popup-content h2 {
+                font-size: 1.8rem; /* Tamanho do título menor para celular */
+            }
+
+            .popup-content button {
+                font-size: 1rem; /* Tamanho do botão menor para celular */
+                padding: 12px 24px; /* Preenchimento menor para celular */
+            }
+        }
+
+    </style>
 </head>
-<body class="login-body">
-    <div class="login-container">
-        <div id="login-form">
-            <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
-            <p>Insira sua lista M3U / M3U8 para começar.</p>
-            <input type="text" id="urlInput" placeholder="URL da lista M3U">
-            <div class="separator">ou</div>
-            <label for="fileInput" class="file-label">
-                <span id="file-name">Selecionar arquivo .m3u</span>
-                <input type="file" id="fileInput" accept=".m3u,.m3u8">
-            </label>
-            <button id="loadButton">Carregar Player</button>
-            <div class="copyright-notice">
-                Este aplicativo é um reprodutor de mídia e não fornece ou armazena conteúdo. Todo o conteúdo é carregado a partir das listas fornecidas pelo próprio usuário.
-            </div>
-            <div id="error-message"></div>
-        </div>
-        <div id="login-loader">
-            <div class="loading-yashi">
-                <span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span>
-            </div>
-            <div id="loading-status">Iniciando...</div>
+<body>
+
+    <!-- Pop-up de Entrada -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <h2>A festa vai começar!</h2>
+            <button id="close-popup-btn">Clique para entrar</button>
         </div>
     </div>
-    
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/sync.js"></script>
-    <script src="js/login.js"></script>
+
+    <div class="cenario">
+        
+        <div class="sol">
+            <div class="rosto-sol">
+                <div class="olho"></div>
+                <div class="olho"></div>
+                <div class="boca"></div>
+            </div>
+        </div>
+
+        <!-- Player de Música Personalizado -->
+        <div class="music-player-container">
+            <audio id="music-player" loop>
+                <source src="musica.mp3" type="audio/mpeg">
+                Seu navegador não suporta o elemento de áudio.
+            </audio>
+            <button id="play-pause-btn" class="player-button">▶️</button>
+        </div>
+
+        <!-- Container do Conteúdo Central -->
+        <div class="conteudo-central">
+            <img src="top.png" alt="Ravi no Mundo Bita" class="header-imagem">
+            
+            <div class="info-texto">
+                <p class="convite-texto">Prepare o bigode e a animação: o Mundo do Ravi está em festa e a aventura começa agora! Confirme sua presença e embarque nesse universo encantado com a gente!</p>
+                <div class="aniversario-texto">meu primeiro aniversario 🎈🎈<br>( 01 aninho)</div>
+            </div>
+            
+            <div class="botoes-container">
+                <a href="#" class="botao botao-confirmar">Confirmar Presença</a>
+                <a href="#" class="botao botao-local">Local da Festa</a>
+            </div>
+        </div>
+
+        <div class="nuvem nuvem1"></div>
+        <div class="nuvem nuvem2"></div>
+        <div class="nuvem nuvem3"></div>
+        <div class="nuvem nuvem4"></div>
+        <div class="nuvem nuvem5"></div>
+
+        <div class="grama-container">
+            <svg class="grama-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path d="M0,120 L1440,120 L1440,60 C1200,80 900,30 600,60 C300,90 100,80 0,60 Z" fill="#4CAF50"></path>
+                <g fill="#388E3C">
+                    <path class="lamina" d="M100 80 Q 102 60 104 80z"></path>
+                    <path class="lamina" d="M180 78 Q 183 54 186 78z" style="transform: scale(0.8)"></path>
+                    <path class="lamina" d="M250 75 Q 252 59 254 75z" style="transform: scale(1.1)"></path>
+                    <path class="lamina" d="M340 82 Q 343 62 346 82z"></path>
+                    <path class="lamina" d="M450 70 Q 452 50 454 70z" style="transform: scale(0.9)"></path>
+                    <path class="lamina" d="M580 63 Q 583 35 586 63z"></path>
+                    <path class="lamina" d="M700 61 Q 702 43 704 61z" style="transform: scale(1.2)"></path>
+                    <path class="lamina" d="M810 54 Q 813 30 816 54z"></path>
+                    <path class="lamina" d="M920 49 Q 922.5 27 925 49z" style="transform: scale(0.85)"></path>
+                    <path class="lamina" d="M1050 58 Q 1052 42 1054 58z"></path>
+                    <path class="lamina" d="M1180 72 Q 1183 48 1186 72z" style="transform: scale(1.1)"></path>
+                    <path class="lamina" d="M1300 75 Q 1303 55 1306 75z"></path>
+                </g>
+            </svg>
+            <!-- Créditos Adicionados -->
+            <div class="footer-creditos">
+                Desenvolvido por <a href="https://wa.me/5562998413382" target="_blank">Julio Martins</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ARQUIVO: script.js (incorporado no HTML para simplicidade) ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioPlayer = document.getElementById('music-player');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const popupOverlay = document.getElementById('popup-overlay');
+            const closePopupBtn = document.getElementById('close-popup-btn');
+
+            // --- CORREÇÃO: Autoplay iniciado após o clique no pop-up ---
+            const startMusic = () => {
+                // Define o tempo inicial para 5 segundos
+                audioPlayer.currentTime = 5;
+                // Tenta tocar a música
+                const promise = audioPlayer.play();
+                if (promise !== undefined) {
+                    promise.catch(error => {
+                        console.warn("Autoplay foi bloqueado. A música começará com o botão de play.");
+                    });
+                }
+            };
+
+            // Adiciona um ouvinte para fechar o pop-up e iniciar a música
+            closePopupBtn.addEventListener('click', () => {
+                popupOverlay.style.display = 'none';
+                startMusic();
+            });
+
+            // Controla o play/pause com o clique no botão de música
+            playPauseBtn.addEventListener('click', (event) => {
+                // Impede que o clique no botão dispare outros eventos
+                event.stopPropagation(); 
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.pause();
+                }
+            });
+
+            // Atualiza o ícone do botão com base no estado do player
+            audioPlayer.addEventListener('play', () => {
+                playPauseBtn.textContent = '⏸️';
+            });
+
+            audioPlayer.addEventListener('pause', () => {
+                playPauseBtn.textContent = '▶️';
+            });
+        });
+    </script>
+
 </body>
 </html>
