@@ -29,6 +29,94 @@
             overflow: hidden;
         }
         
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .popup-overlay.visivel {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #00A9E0, #D90077);
+            padding: 20px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 90%;
+            width: 400px;
+            color: white;
+            border: 4px solid white;
+        }
+
+        .popup-content h2 {
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            margin-top: 0;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .popup-content p {
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            line-height: 1.5;
+        }
+
+        .popup-content button {
+            background-color: white;
+            color: #D90077;
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        .popup-content button:hover {
+            transform: scale(1.1);
+        }
+
+        .music-player-container {
+            position: absolute;
+            top: 3vh;
+            right: 2vw;
+            z-index: 30;
+        }
+
+        .player-button {
+            background-color: #D90077;
+            border: 2px solid white;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        
+        .player-button:hover {
+            transform: scale(1.1);
+        }
+        
         .sol {
             position: absolute;
             top: 5vh;
@@ -92,7 +180,7 @@
         
         .conteudo-central {
             position: absolute;
-            top: 2vh;
+            top: 1vh;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
@@ -100,13 +188,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             z-index: 20;
         }
 
         .header-imagem {
-            width: 68%; 
-            max-width: 340px; 
+            width: 60%; 
+            max-width: 300px; 
             height: auto;
         }
 
@@ -115,7 +203,7 @@
             max-width: 400px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
         .form-confirmacao label {
@@ -132,6 +220,16 @@
             font-family: 'Fredoka One', cursive;
             font-size: 1rem;
             box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes inputFocus {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(255,255,255,0.7); }
+        }
+        
+        .form-confirmacao input:focus {
+            animation: inputFocus 1.5s ease-in-out infinite;
         }
 
         .form-botoes {
@@ -152,6 +250,11 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
             cursor: pointer;
             font-family: 'Fredoka One', cursive;
+            transition: background-color 0.3s;
+        }
+        .botao-form:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
         .botao-form.confirmar { background-color: #00A9E0; }
@@ -162,7 +265,7 @@
             justify-content: center;
             gap: 15px;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .botao-nav {
@@ -173,11 +276,17 @@
             border: 3px solid white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: pularBotao 2s ease-in-out infinite;
+        }
+        
+        @keyframes pularBotao {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .botao-nav:hover {
@@ -185,21 +294,21 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        .botao-home { background-color: #00A9E0; }
+        .botao-home { background-color: #00A9E0; animation-delay: -1s; }
         .botao-home svg {
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             fill: white;
         }
         .botao-local { 
             background-color: #D90077;
             font-size: 0.8rem;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             width: auto;
             height: auto;
             border-radius: 50px;
-            min-width: 120px;
+            min-width: 100px;
         }
         
         .grama-container {
@@ -277,14 +386,6 @@
             text-decoration: none;
             font-weight: bold;
         }
-        
-        #mensagem-feedback {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            color: #005A7A;
-            text-shadow: 1px 1px 0 white;
-            display: none; /* Começa escondido */
-        }
 
     </style>
 </head>
@@ -299,6 +400,13 @@
                 <div class="boca"></div>
             </div>
         </div>
+        
+        <div class="music-player-container">
+            <audio id="music-player" loop>
+                <source src="musica.mp3" type="audio/mpeg">
+            </audio>
+            <button id="play-pause-btn" class="player-button">▶️</button>
+        </div>
 
         <!-- Container do Conteúdo Central -->
         <div class="conteudo-central">
@@ -309,15 +417,13 @@
                 <input type="text" id="nome" name="nome" required>
                 
                 <label for="quantidade">Quantidade de pessoas na família:</label>
-                <input type="number" id="quantidade" name="quantidade" min="1" required>
+                <input type="number" id="quantidade" name="quantidade" min="1">
 
                 <div class="form-botoes">
                     <button type="submit" name="status" value="Confirmado" class="botao-form confirmar">Confirmo Presença</button>
                     <button type="submit" name="status" value="Negado" class="botao-form negar">Infelizmente não poderei ir</button>
                 </div>
             </form>
-            
-            <p id="mensagem-feedback"></p>
             
             <div class="botoes-navegacao">
                 <a href="index.html" class="botao-nav botao-home" title="Voltar para o Início">
@@ -345,40 +451,125 @@
             </div>
         </div>
     </div>
+    
+    <!-- Pop-up Inicial -->
+    <div id="initial-popup" class="popup-overlay visivel">
+        <div class="popup-content">
+            <h2>Informações Importantes!</h2>
+            <p>A sua alegria é o nosso único presente! A entrada no local é por nossa conta. Cada família terá uma comanda individual para o consumo de salgados e bebidas. Docinhos e bolo são por nossa conta! 🥳 Para a diversão não ter fim, o espaço kids (para crianças e adultos!) tem um valor fixo por pessoa para brincar à vontade.</p>
+            <button id="close-initial-popup-btn">Entendi!</button>
+        </div>
+    </div>
+    
+    <!-- Pop-up de Feedback -->
+    <div id="feedback-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2 id="feedback-title"></h2>
+            <p id="feedback-message"></p>
+            <button id="close-feedback-btn">Fechar</button>
+        </div>
+    </div>
 
-    <!-- Script para enviar dados para o WhatsApp -->
+    <!-- Script para enviar dados para a Planilha Google -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwH0VyYrlId0nbxuzS6QlWrgssXcu6Tf3JU1ueNA3OhOl70gnpUdIPQ2PkzUKjbpdp5bA/exec'; 
             const form = document.getElementById('confirmationForm');
-            const feedbackMessage = document.getElementById('mensagem-feedback');
+            
+            const initialPopup = document.getElementById('initial-popup');
+            const closeInitialPopupBtn = document.getElementById('close-initial-popup-btn');
+            
+            const feedbackPopup = document.getElementById('feedback-popup');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const closeFeedbackBtn = document.getElementById('close-feedback-btn');
+            
+            const audioPlayer = document.getElementById('music-player');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+
+            let musicStarted = false;
+            const startMusic = () => {
+                if(musicStarted) return;
+                musicStarted = true;
+                audioPlayer.currentTime = 5;
+                audioPlayer.play().catch(e => console.error("Erro ao tocar música:", e));
+            };
+            
+            closeInitialPopupBtn.addEventListener('click', () => {
+                initialPopup.classList.remove('visivel');
+                startMusic();
+            });
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const statusButton = e.submitter;
                 const status = statusButton.value;
-                const nome = document.getElementById('nome').value;
-                const quantidade = document.getElementById('quantidade').value;
-                const numeroTelefone = '5562994263011'; // Seu número de telefone aqui
-
-                let mensagem = '';
-
-                if (status === 'Confirmado') {
-                    mensagem = `🎉 Olá! Acabei de confirmar presença na festa de 1 aninho do Ravi! 🎂\n\n*Nome:* ${nome}\n*Quantidade de pessoas:* ${quantidade}\n\nMal podemos esperar para comemorar com vocês! 🥳`;
-                } else {
-                    mensagem = `😥 Olá! Com muita pena, informo que não poderemos comparecer à festa de 1 aninho do Ravi. 💔\n\n*Nome:* ${nome}\n\nAgradecemos muito o convite e desejamos uma festa incrível! 🎉`;
+                const nomeInput = form.querySelector('#nome');
+                const quantidadeInput = form.querySelector('#quantidade');
+                
+                // Validação do Nome
+                if (nomeInput.value.trim() === '') {
+                    alert('Por favor, preencha o seu nome.');
+                    return;
+                }
+                
+                // Validação da Quantidade (apenas para confirmação)
+                if (status === 'Confirmado' && (quantidadeInput.value === '' || quantidadeInput.value < 1)) {
+                    alert('Por favor, informe a quantidade de pessoas.');
+                    return;
                 }
 
-                // Codifica a mensagem para a URL do WhatsApp
-                const whatsappURL = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(mensagem)}`;
+                const formData = new FormData();
+                formData.append('nome', nomeInput.value);
+                formData.append('quantidade', status === 'Negado' ? '0' : quantidadeInput.value);
+                formData.append('status', status);
 
-                // Desabilita os botões e mostra feedback
-                form.querySelectorAll('button').forEach(button => button.disabled = true);
-                feedbackMessage.textContent = 'Redirecionando para o WhatsApp...';
-                feedbackMessage.style.display = 'block';
+                statusButton.disabled = true;
+                statusButton.textContent = 'Enviando...';
 
-                // Redireciona para o WhatsApp
-                window.open(whatsappURL, '_blank');
+                fetch(scriptURL, { method: 'POST', body: formData })
+                    .then(response => {
+                        if (status === 'Confirmado') {
+                            feedbackTitle.textContent = 'Presença Confirmada! 🎉';
+                            feedbackMessage.textContent = 'Que alegria! A sua presença vai deixar a festa do Ravi ainda mais especial. Mal podemos esperar para comemorar com vocês!';
+                        } else {
+                            feedbackTitle.textContent = 'Que pena! 😥';
+                            feedbackMessage.textContent = 'Sentiremos a vossa falta! Agradecemos por avisar e esperamos que possam enviar boas energias para o Ravi neste dia especial.';
+                        }
+                        feedbackPopup.classList.add('visivel');
+                    })
+                    .catch(error => {
+                        feedbackTitle.textContent = 'Ops! Algo deu errado...';
+                        feedbackMessage.textContent = 'Não foi possível enviar a sua resposta. Por favor, verifique a sua conexão e tente novamente.';
+                        feedbackPopup.classList.add('visivel');
+                    })
+                    .finally(() => {
+                        statusButton.disabled = false;
+                        statusButton.textContent = status === 'Confirmado' ? 'Confirmo Presença' : 'Infelizmente não poderei ir';
+                        form.reset();
+                    });
+            });
+            
+            closeFeedbackBtn.addEventListener('click', () => {
+                feedbackPopup.classList.remove('visivel');
+            });
+
+            playPauseBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.pause();
+                }
+            });
+
+            audioPlayer.addEventListener('play', () => {
+                playPauseBtn.textContent = '⏸️';
+            });
+
+            audioPlayer.addEventListener('pause', () => {
+                playPauseBtn.textContent = '▶️';
             });
         });
     </script>
