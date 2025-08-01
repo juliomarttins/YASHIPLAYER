@@ -1,0 +1,106 @@
+/* /css/favoritos.css (v7.0 - Estilos para botões de Exportar/Importar) */
+
+/* Container principal para as prateleiras */
+.shelf-container {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+/* Prateleira individual */
+.category-shelf {
+    width: 100%;
+}
+
+/* Cabeçalho da prateleira */
+.shelf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+.shelf-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.shelf-title .icon {
+    color: var(--yashi-cyan);
+    font-size: 1.1rem;
+}
+
+.item-carousel {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: 5px;
+    margin: -5px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+.item-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.item-carousel .card {
+    flex-shrink: 0;
+    width: 150px;
+}
+
+.no-favorites {
+    text-align: center;
+    color: var(--text-secondary-color);
+    padding: 50px 0;
+}
+
+/* Container para os botões de ação */
+.favorites-actions {
+    display: flex;
+    justify-content: center; /* Centraliza os botões */
+    gap: 15px; /* Espaçamento entre os botões */
+    margin-bottom: 30px; /* Espaçamento abaixo dos botões */
+    padding: 10px;
+    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+}
+
+.action-button {
+    background-color: var(--surface-color);
+    color: var(--yashi-cyan);
+    border: 1px solid var(--yashi-cyan);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-button:hover {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.2);
+}
+
+.action-button i {
+    font-size: 1.1rem;
+}
+
+/* Estilo para a mensagem de "Nenhum resultado" */
+#no-results {
+    color: var(--text-secondary-color);
+    text-align: center;
+    width: 100%;
+    margin-top: 50px;
+    font-size: 1.1rem;
+}

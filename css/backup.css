@@ -1,0 +1,93 @@
+.backup-container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.backup-container h1 {
+    font-size: 2rem;
+    color: var(--yashi-cyan);
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary-color);
+    margin-bottom: 40px;
+}
+
+.cards-container {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    flex-grow: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.action-card .icon {
+    font-size: 2.5rem;
+    color: var(--yashi-cyan);
+    margin-bottom: 20px;
+    align-self: center;
+}
+
+.action-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.action-card p {
+    color: var(--text-secondary-color);
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.backup-button {
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.backup-button:hover {
+    transform: translateY(-3px);
+}
+
+.backup-button.export {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+}
+.backup-button.export:hover {
+    box-shadow: 0 5px 20px rgba(0, 240, 240, 0.4);
+}
+
+.backup-button.import {
+    background-color: transparent;
+    color: var(--yashi-cyan);
+    border: 2px solid var(--yashi-cyan);
+}
+.backup-button.import:hover {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+}
