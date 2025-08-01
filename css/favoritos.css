@@ -1,82 +1,30 @@
-/* /css/favoritos.css (v7.0 - Estilos para botões de Exportar/Importar) */
+/* /css/favoritos.css (v9.6B - Estilos para Visualização Híbrida) */
 
-/* Container principal para as prateleiras */
-.shelf-container {
-    display: flex;
-    flex-direction: column;
-    gap: 35px;
-}
-
-/* Prateleira individual */
-.category-shelf {
-    width: 100%;
-}
-
-/* Cabeçalho da prateleira */
-.shelf-header {
+/* Cabeçalho da página de favoritos */
+.favorites-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
     padding: 0 5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
 }
 
-.shelf-title {
-    font-size: 1.3rem;
+.favorites-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
     font-weight: 500;
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
-.shelf-title .icon {
-    color: var(--yashi-cyan);
-    font-size: 1.1rem;
-}
-
-.item-carousel {
-    display: flex;
-    gap: 1.25rem;
-    overflow-x: auto;
-    padding: 5px;
-    margin: -5px;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-}
-.item-carousel::-webkit-scrollbar {
-    display: none;
-}
-
-.item-carousel .card {
-    flex-shrink: 0;
-    width: 150px;
-}
-
-.no-favorites {
-    text-align: center;
-    color: var(--text-secondary-color);
-    padding: 50px 0;
-}
-
-/* Container para os botões de ação */
-.favorites-actions {
-    display: flex;
-    justify-content: center; /* Centraliza os botões */
-    gap: 15px; /* Espaçamento entre os botões */
-    margin-bottom: 30px; /* Espaçamento abaixo dos botões */
-    padding: 10px;
-    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
-}
-
+/* Estilo para o botão "Ver Todos" e outros botões de ação */
 .action-button {
     background-color: var(--surface-color);
     color: var(--yashi-cyan);
     border: 1px solid var(--yashi-cyan);
     padding: 10px 20px;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
@@ -96,11 +44,16 @@
     font-size: 1.1rem;
 }
 
-/* Estilo para a mensagem de "Nenhum resultado" */
-#no-results {
-    color: var(--text-secondary-color);
+/* Mensagens de feedback */
+.no-favorites, #no-results {
     text-align: center;
-    width: 100%;
-    margin-top: 50px;
+    color: var(--text-secondary-color);
+    padding: 50px 0;
     font-size: 1.1rem;
+    grid-column: 1 / -1;
+}
+
+/* Garante que o carrossel não tenha botões de rolagem, pois a intenção é scroll manual */
+.item-carousel .scroll-button {
+    display: none;
 }

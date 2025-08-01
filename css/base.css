@@ -53,6 +53,13 @@ body { background-color: var(--background-color); color: var(--text-color); font
 .grid-container.view-details, .grid-container.view-list { grid-template-columns: 1fr; gap: 0.75rem; }
 .card { background-color: var(--surface-color); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; border: 1px solid transparent; position: relative; }
 .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); border-color: var(--border-color); }
+/* ADICIONADO: Estilo de foco para navegação por teclado */
+.card:focus, .card:focus-visible { 
+    outline: none;
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px var(--yashi-cyan-glow);
+    border-color: var(--yashi-cyan);
+}
 .card-img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; background-color: #21262d; }
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .grid-container.view-details .card, .grid-container.view-list .card { flex-direction: row; align-items: center; }

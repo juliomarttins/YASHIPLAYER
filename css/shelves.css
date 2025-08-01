@@ -1,4 +1,4 @@
-/* /css/shelves.css (v8.0B - Unificado) */
+/* /css/shelves.css (v9.6B - CORRIGIDO: Estilos para Setas de Navegação) */
 
 /* Container principal para as prateleiras */
 .shelf-container {
@@ -55,6 +55,7 @@
     transform: scale(1.05);
 }
 
+/* --- ESTILOS PARA AS SETAS DE NAVEGAÇÃO --- */
 .carousel-wrapper {
     position: relative;
 }
@@ -90,11 +91,15 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    opacity: 0.7;
+    opacity: 0; /* Começa invisível */
+    visibility: hidden;
 }
+
 .carousel-wrapper:hover .scroll-button {
-    opacity: 1;
+    opacity: 0.8; /* Aparece no hover do wrapper */
+    visibility: visible;
 }
+
 .scroll-button.prev {
     left: -20px;
 }
@@ -102,16 +107,16 @@
     right: -20px;
 }
 .scroll-button:hover {
+    opacity: 1 !important;
     background-color: var(--yashi-cyan);
     color: var(--background-color);
     border-color: var(--yashi-cyan);
+    transform: translateY(-50%) scale(1.1);
 }
 .scroll-button:disabled {
-    opacity: 0.2 !important;
+    opacity: 0 !important;
+    visibility: hidden;
     cursor: not-allowed;
-    background-color: rgba(13, 17, 23, 0.8);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
 }
 
 .item-carousel .card {

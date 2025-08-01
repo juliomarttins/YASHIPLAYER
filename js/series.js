@@ -1,4 +1,4 @@
-// js/series.js (v7.0 - Correção de Navegação e Reprodução de Séries)
+// js/series.js (v9.6B - CORRIGIDO: Capas de Temporada)
 document.addEventListener('DOMContentLoaded', async () => {
     if (!window.db) { window.location.href = 'index.html'; return; }
 
@@ -6,12 +6,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     Yashi.initCommon(PAGE_TYPE);
 
     const { 
-        gridContainer, topBarBackButton, 
+        gridContainer, topBarBackButton, viewButtons,
         categoryMenuButton, categorySidebar, sidebarOverlay, 
-        categoryListContainer, closeSidebarButton 
+        categoryListContainer, closeSidebarButton,
+        searchInput, searchButton
     } = Yashi.elements;
     
     const renderTarget = gridContainer;
+    const viewButtonsContainer = viewButtons[0].parentElement;
 
     let allSeries = [];
     let categoryCounts = {};
@@ -24,19 +26,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             categorySidebar.classList.add('active');
             sidebarOverlay.classList.add('active');
+            categoryListContainer.querySelector('button')?.focus();
         }
     };
 
     const updateBackButton = () => {
-        if (Yashi.navigationStack.length > 1) {
-            topBarBackButton.style.display = 'flex';
-            topBarBackButton.onclick = () => {
-                Yashi.navigationStack.pop();
-                renderCurrentState();
-            };
-        } else {
-            topBarBackButton.style.display = 'none';
-        }
+        topBarBackButton.style.display = Yashi.navigationStack.length > 1 ? 'flex' : 'none';
+        topBarBackButton.onclick = () => {
+            Yashi.navigationStack.pop();
+            Yashi.reRenderCurrentContent();
+        };
     };
 
     const renderFullGridView = (category) => {
@@ -44,24 +43,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? allSeries
             : allSeries.filter(serie => (serie.groupTitle || 'Outros') === category);
         
-        renderTarget.className = 'grid-container'; 
+        viewButtonsContainer.classList.remove('disabled');
         renderTarget.innerHTML = '';
-        
-        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
-        Yashi.navigationStack.push({ type: 'fullGrid', data: seriesForCategory, renderFunc: () => renderFullGridView(category) });
-
         Yashi.renderGrid(seriesForCategory, renderTarget);
         updateBackButton();
+        setTimeout(() => renderTarget.querySelector('.card')?.focus(), 100);
     };
     
     const handleCarouselScroll = (carousel, prevBtn, nextBtn) => {
         const scrollEnd = carousel.scrollWidth - carousel.clientWidth;
-        prevBtn.disabled = carousel.scrollLeft <= 0;
-        nextBtn.disabled = carousel.scrollLeft >= scrollEnd - 1;
+        prevBtn.disabled = carousel.scrollLeft <= 10;
+        nextBtn.disabled = carousel.scrollLeft >= scrollEnd - 10;
     };
 
     const renderShelvesView = () => {
-        Yashi.elements.viewButtons.forEach(btn => btn.parentElement.classList.add('disabled'));
+        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
+        viewButtonsContainer.classList.add('disabled');
 
         renderTarget.className = 'shelf-container';
         renderTarget.innerHTML = '<div class="content-loader"><div class="loading-yashi" style="font-size: 40px;"><span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span></div></div>';
@@ -72,116 +69,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             [shelfCategories[i], shelfCategories[j]] = [shelfCategories[j], shelfCategories[i]];
         }
         
-        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
-
         const fragment = document.createDocumentFragment();
-
         shelfCategories.forEach(category => {
             const seriesForCategory = allSeries.filter(serie => (serie.groupTitle || 'Outros') === category);
-            
+            if(seriesForCategory.length === 0) return;
+
             const shelf = document.createElement('div');
             shelf.className = 'category-shelf';
+            shelf.setAttribute('data-focus-group', '');
 
             const iconClass = seriesCategoryIcons[Object.keys(seriesCategoryIcons).find(key => category.toUpperCase().includes(key.toUpperCase()))] || seriesCategoryIcons['Padrão'];
 
             const header = document.createElement('div');
             header.className = 'shelf-header';
             header.innerHTML = `
-                <div class="shelf-title">
-                    <i class="icon ${iconClass}"></i>
-                    <span>${category}</span>
-                    <button class="view-all-button">VER TODAS (${seriesForCategory.length})</button>
-                </div>
+                <div class="shelf-title"><i class="icon ${iconClass}"></i><span>${category}</span></div>
+                <button class="view-all-button" tabindex="0">VER TODAS (${seriesForCategory.length})</button>
             `;
-            header.querySelector('.view-all-button').addEventListener('click', () => renderFullGridView(category));
+            header.querySelector('.view-all-button').addEventListener('click', () => {
+                Yashi.navigationStack.push({ type: 'fullGrid', renderFunc: () => renderFullGridView(category) });
+                renderFullGridView(category);
+            });
             
             const carouselWrapper = document.createElement('div');
             carouselWrapper.className = 'carousel-wrapper';
-
             const prevBtn = document.createElement('button');
             prevBtn.className = 'scroll-button prev';
             prevBtn.innerHTML = '&#10094;';
-            prevBtn.disabled = true;
-
             const nextBtn = document.createElement('button');
             nextBtn.className = 'scroll-button next';
             nextBtn.innerHTML = '&#10095;';
-
             const carousel = document.createElement('div');
             carousel.className = 'item-carousel';
             
-            const seriesToShow = seriesForCategory.slice(0, 20);
-            seriesToShow.forEach(serie => {
-                const card = Yashi.createCard(serie);
-                carousel.appendChild(card);
+            seriesForCategory.slice(0, 20).forEach(serie => {
+                carousel.appendChild(Yashi.createCard(serie));
             });
 
-            prevBtn.addEventListener('click', () => carousel.scrollBy(-carousel.clientWidth * 0.8, 0));
-            nextBtn.addEventListener('click', () => carousel.scrollBy(carousel.clientWidth * 0.8, 0));
+            prevBtn.addEventListener('click', () => carousel.scrollBy({ left: -carousel.clientWidth * 0.8, behavior: 'smooth' }));
+            nextBtn.addEventListener('click', () => carousel.scrollBy({ left: carousel.clientWidth * 0.8, behavior: 'smooth' }));
             carousel.addEventListener('scroll', () => handleCarouselScroll(carousel, prevBtn, nextBtn));
             
-            setTimeout(() => handleCarouselScroll(carousel, prevBtn, nextBtn), 150);
-
-            carouselWrapper.appendChild(prevBtn);
-            carouselWrapper.appendChild(carousel);
-            carouselWrapper.appendChild(nextBtn);
-
-            shelf.appendChild(header);
-            shelf.appendChild(carouselWrapper);
+            carouselWrapper.append(prevBtn, carousel, nextBtn);
+            shelf.append(header, carouselWrapper);
             fragment.appendChild(shelf);
+            
+            setTimeout(() => handleCarouselScroll(carousel, prevBtn, nextBtn), 200);
         });
 
         renderTarget.innerHTML = '';
         renderTarget.appendChild(fragment);
         updateBackButton();
+        setTimeout(() => document.querySelector('.view-all-button, .card')?.focus(), 100);
     };
 
-    const renderCategorySidebar = (categories) => {
-        categoryListContainer.innerHTML = '';
-        categories.forEach(category => {
-            const button = document.createElement('button');
-            button.className = 'sidebar-category-button';
-            
+    const renderCategorySidebar = () => {
+        const sortedCategories = Object.keys(categoryCounts).sort((a, b) => a.localeCompare(b));
+        categoryListContainer.innerHTML = sortedCategories.map(category => {
             const count = categoryCounts[category] || 0;
-            if (count === 0) return;
+            if (count === 0) return '';
+            return `<button class="sidebar-category-button" data-category="${category}" tabindex="0">${category} (${count})</button>`
+        }).join('');
 
-            button.textContent = `${category} (${count})`;
-            button.dataset.category = category;
-
+        document.querySelectorAll('.sidebar-category-button').forEach(button => {
             button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                Yashi.navigationStack.push({ type: 'fullGrid', renderFunc: () => renderFullGridView(category) });
                 renderFullGridView(category);
                 toggleSidebar(true);
             });
-            categoryListContainer.appendChild(button);
         });
-    };
-
-    const renderCurrentState = () => {
-        const currentState = Yashi.navigationStack[Yashi.navigationStack.length - 1];
-        if (!currentState) return;
-
-        const viewButtonsContainer = Yashi.elements.viewButtons[0].parentElement;
-        if (currentState.type === 'shelfList') {
-            viewButtonsContainer.classList.add('disabled');
-        } else {
-            viewButtonsContainer.classList.remove('disabled');
-        }
-
-        if (currentState.renderFunc) {
-            renderTarget.className = 'grid-container'; 
-            currentState.renderFunc();
-        } else if (currentState.data) {
-            Yashi.renderGrid(currentState.data, renderTarget);
-        }
-        updateBackButton(); 
-    };
-
-    const performSearch = () => {
-        const query = Yashi.elements.searchInput.value.trim();
-        if (query) {
-            localStorage.setItem('yashi_search_query', query);
-            window.location.href = 'search.html';
-        }
     };
 
     const loadAndProcessSeries = async () => {
@@ -189,62 +146,72 @@ document.addEventListener('DOMContentLoaded', async () => {
             allSeries = await db.series.orderBy('name').toArray();
             
             const seriesNameToLoad = localStorage.getItem('yashi_deep_link_series_name');
+            localStorage.removeItem('yashi_deep_link_series_name');
+            
             if (seriesNameToLoad) {
-                localStorage.removeItem('yashi_deep_link_series_name');
                 const foundSeries = allSeries.find(s => s.name === seriesNameToLoad);
                 if (foundSeries) {
+                    // --- LÓGICA DE CAPAS RESTAURADA AQUI ---
                     const seasons = Object.values(foundSeries.seasons).sort((a, b) => a.number - b.number);
                     seasons.forEach(season => {
                         if (season.episodes && season.episodes.length > 0) {
-                            season.episodes.sort((a, b) => a.number - b.number);
-                            season.logo = season.episodes[0].logo || foundSeries.logo; 
+                            const sortedEpisodes = season.episodes.sort((epA, epB) => epA.number - epB.number);
+                            season.logo = sortedEpisodes[0].logo || foundSeries.logo;
                         } else {
                             season.logo = foundSeries.logo;
                         }
                     });
-                    Yashi.navigationStack = [
-                        { type: 'shelfList', renderFunc: renderShelvesView },
-                        { type: 'fullGrid', data: [foundSeries], renderFunc: () => renderFullGridView(foundSeries.groupTitle) },
-                        { type: 'seasonList', data: seasons, title: foundSeries.name, parentSeries: foundSeries, renderFunc: () => Yashi.renderGrid(seasons, renderTarget) }
-                    ];
-                    renderCurrentState(); 
-                    return; 
+                    // --- FIM DA LÓGICA DE CAPAS ---
+
+                    Yashi.navigationStack.push({
+                        type: 'seriesDetail',
+                        renderFunc: () => {
+                            viewButtonsContainer.classList.remove('disabled');
+                            Yashi.renderGrid(seasons, renderTarget, { parentSeries: foundSeries });
+                            updateBackButton();
+                            setTimeout(() => renderTarget.querySelector('.card')?.focus(), 100);
+                        }
+                    });
+                    Yashi.reRenderCurrentContent();
+                    return;
                 }
             }
 
             categoryCounts = {};
             allSeries.forEach(serie => {
-                const category = serie.groupTitle && serie.groupTitle.trim() !== '' ? serie.groupTitle.trim() : 'Outros';
+                const category = serie.groupTitle || 'Outros';
                 categoryCounts[category] = (categoryCounts[category] || 0) + 1;
             });
-            categoryCounts['Todos'] = allSeries.length; 
-
-            const sortedSidebarCategories = Object.keys(categoryCounts).sort((a,b) => a.localeCompare(b));
-            renderCategorySidebar(sortedSidebarCategories);
-
-            renderShelvesView(); 
-
+            categoryCounts['Todos'] = allSeries.length;
+            renderShelvesView();
+            renderCategorySidebar();
         } catch (e) {
-            renderTarget.innerHTML = '<p id="no-results">Falha ao carregar séries do banco de dados.</p>';
-            console.error('Erro ao carregar séries:', e);
+            renderTarget.innerHTML = '<p id="no-results">Falha ao carregar séries.</p>';
+            console.error(e);
         }
     };
     
-    Yashi.reRenderCurrentContent = renderCurrentState;
-    
+    Yashi.reRenderCurrentContent = () => {
+        const currentState = Yashi.navigationStack[Yashi.navigationStack.length - 1];
+        if (currentState && currentState.renderFunc) {
+            currentState.renderFunc();
+        }
+    };
+
     categoryMenuButton.addEventListener('click', () => toggleSidebar());
     closeSidebarButton.addEventListener('click', () => toggleSidebar(true));
     sidebarOverlay.addEventListener('click', () => toggleSidebar(true));
-
-    // Ativa a funcionalidade de busca de forma segura
-    if (Yashi.elements.searchButton && Yashi.elements.searchInput) {
-        Yashi.elements.searchButton.addEventListener('click', performSearch);
-        Yashi.elements.searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') performSearch();
-        });
-    } else {
-        console.error("YASHI PLAYER: Elementos de busca não foram encontrados na página de Séries.");
-    }
+    
+    searchButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            localStorage.setItem('yashi_search_query', query);
+            window.location.href = 'search.html';
+        }
+    });
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') searchButton.click();
+    });
 
     loadAndProcessSeries();
 });

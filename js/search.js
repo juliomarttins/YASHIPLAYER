@@ -103,7 +103,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'card';
         const defaultImg = 'https://placehold.co/180x270/0D1117/8B949E?text=Sem+Capa';
-        
+
+        // --- LÓGICA DO BOTÃO DE FAVORITAR (ADICIONADA) ---
+        const itemType = item.seasons ? 'series' : item.type;
+        const favoriteName = item.name;
+
+        if (itemType === 'movie' || itemType === 'channel' || itemType === 'series') {
+            const favButton = document.createElement('button');
+            favButton.className = 'favorite-button';
+            favButton.innerHTML = '<i class="fa-regular fa-star"></i>';
+            favButton.title = 'Adicionar aos Favoritos';
+            
+            db.favorites.get(favoriteName).then(fav => {
+                if (fav) {
+                    favButton.classList.add('active');
+                    favButton.innerHTML = '<i class="fa-solid fa-star"></i>';
+                    favButton.title = 'Remover dos Favoritos';
+                }
+            });
+
+            favButton.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const isFavorited = favButton.classList.contains('active');
+                if (isFavorited) {
+                    await db.favorites.delete(favoriteName);
+                    favButton.classList.remove('active');
+                    favButton.innerHTML = '<i class="fa-regular fa-star"></i>';
+                    favButton.title = 'Adicionar aos Favoritos';
+                    Yashi.showToast(`"${favoriteName}" removido dos favoritos.`, 'error');
+                } else {
+                    await db.favorites.put({ name: favoriteName, type: itemType, data: item });
+                    favButton.classList.add('active');
+                    favButton.innerHTML = '<i class="fa-solid fa-star"></i>';
+                    favButton.title = 'Remover dos Favoritos';
+                    Yashi.showToast(`"${favoriteName}" adicionado aos favoritos!`, 'success');
+                }
+            });
+            card.appendChild(favButton);
+        }
+        // --- FIM DA LÓGICA DO BOTÃO ---
+
         let title = item.name;
         let image = item.logo || defaultImg;
         let description = '';
@@ -112,29 +151,34 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (item.type === 'movie') description = `Categoria: ${item.groupTitle}`;
         else if (item.seasons) description = `Temporadas: ${Object.keys(item.seasons).length}`;
 
+        const cardClickableArea = document.createElement('div'); // Wrapper para clique
+        cardClickableArea.className = 'card-clickable-area';
+
         if (currentViewMode === 'view-list' || currentViewMode === 'view-details') {
-            card.innerHTML = `
+            cardClickableArea.innerHTML = `
                 <img loading="lazy" src="${image}" class="card-img" alt="${title}" onerror="this.onerror=null;this.src='${defaultImg}';">
                 <div class="card-content">
                     <div class="card-title">${title}</div>
                     <div class="card-description">${description}</div>
                 </div>`;
         } else {
-             card.innerHTML = `
+             cardClickableArea.innerHTML = `
                 <img loading="lazy" src="${image}" class="card-img" alt="${title}" onerror="this.onerror=null;this.src='${defaultImg}';">
                 <div class="card-title">${title}</div>`;
         }
+        
+        card.appendChild(cardClickableArea);
 
         if (item.url) {
-            card.addEventListener('click', () => playContent(item));
+            cardClickableArea.addEventListener('click', () => playContent(item));
         } else if (item.seasons) {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', () => {
+            cardClickableArea.style.cursor = 'pointer';
+            cardClickableArea.addEventListener('click', () => {
                 localStorage.setItem('yashi_deep_link_series_name', item.name);
                 window.location.href = 'series.html';
             });
         } else {
-            card.style.cursor = 'default';
+            cardClickableArea.style.cursor = 'default';
         }
         
         return card;

@@ -1,4 +1,4 @@
-// js/canais.js (v18 - View Buttons Logic Fix & Bug Fix)
+// js/canais.js (v9.6B - FOCO AUTOMÁTICO NA NAVEGAÇÃO)
 document.addEventListener('DOMContentLoaded', async () => {
     if (!window.db) { window.location.href = 'index.html'; return; }
 
@@ -26,19 +26,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             categorySidebar.classList.add('active');
             sidebarOverlay.classList.add('active');
+            categoryListContainer.querySelector('button')?.focus();
         }
     };
 
     const updateBackButton = () => {
-        if (Yashi.navigationStack.length > 1) {
-            topBarBackButton.style.display = 'flex';
-            topBarBackButton.onclick = () => {
-                Yashi.navigationStack.pop();
-                renderCurrentState();
-            };
-        } else {
-            topBarBackButton.style.display = 'none';
-        }
+        topBarBackButton.style.display = Yashi.navigationStack.length > 1 ? 'flex' : 'none';
+        topBarBackButton.onclick = () => {
+            Yashi.navigationStack.pop();
+            Yashi.reRenderCurrentContent();
+        };
     };
 
     const renderFullGridView = (category) => {
@@ -48,22 +45,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         viewButtonsContainer.classList.remove('disabled');
         renderTarget.innerHTML = '';
-        
-        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
-        Yashi.navigationStack.push({ type: 'fullGrid', data: channelsForCategory, renderFunc: () => renderFullGridView(category) });
-
         Yashi.renderGrid(channelsForCategory, renderTarget);
         updateBackButton();
+        setTimeout(() => renderTarget.querySelector('.card')?.focus(), 100);
     };
 
     const handleCarouselScroll = (carousel, prevBtn, nextBtn) => {
         const scrollEnd = carousel.scrollWidth - carousel.clientWidth;
-        prevBtn.disabled = carousel.scrollLeft <= 0;
-        nextBtn.disabled = carousel.scrollLeft >= scrollEnd - 1;
+        prevBtn.disabled = carousel.scrollLeft <= 10;
+        nextBtn.disabled = carousel.scrollLeft >= scrollEnd - 10;
     };
 
     const renderShelvesView = () => {
+        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
         viewButtonsContainer.classList.add('disabled');
+        
         renderTarget.className = 'shelf-container';
         renderTarget.innerHTML = '<div class="content-loader"><div class="loading-yashi" style="font-size: 40px;"><span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span></div></div>';
         
@@ -73,136 +69,114 @@ document.addEventListener('DOMContentLoaded', async () => {
             [shelfCategories[i], shelfCategories[j]] = [shelfCategories[j], shelfCategories[i]];
         }
         
-        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
-
         const fragment = document.createDocumentFragment();
-
         shelfCategories.forEach(category => {
             const channelsForCategory = allChannels.filter(channel => (channel.groupTitle || 'Outros') === category);
-            
+            if (channelsForCategory.length === 0) return;
+
             const shelf = document.createElement('div');
             shelf.className = 'category-shelf';
+            shelf.setAttribute('data-focus-group', '');
 
             const iconClass = channelCategoryIcons[Object.keys(channelCategoryIcons).find(key => category.toUpperCase().includes(key.toUpperCase()))] || channelCategoryIcons['Padrão'];
 
             const header = document.createElement('div');
             header.className = 'shelf-header';
             header.innerHTML = `
-                <div class="shelf-title">
-                    <i class="icon ${iconClass}"></i>
-                    <span>${category}</span>
-                    <button class="view-all-button">VER TODOS (${channelsForCategory.length})</button>
-                </div>
+                <div class="shelf-title"><i class="icon ${iconClass}"></i><span>${category}</span></div>
+                <button class="view-all-button" tabindex="0">VER TODOS (${channelsForCategory.length})</button>
             `;
-            header.querySelector('.view-all-button').addEventListener('click', () => renderFullGridView(category));
+            header.querySelector('.view-all-button').addEventListener('click', () => {
+                Yashi.navigationStack.push({ type: 'fullGrid', renderFunc: () => renderFullGridView(category) });
+                renderFullGridView(category);
+            });
             
             const carouselWrapper = document.createElement('div');
             carouselWrapper.className = 'carousel-wrapper';
-
             const prevBtn = document.createElement('button');
             prevBtn.className = 'scroll-button prev';
             prevBtn.innerHTML = '&#10094;';
-            prevBtn.disabled = true;
-
             const nextBtn = document.createElement('button');
             nextBtn.className = 'scroll-button next';
             nextBtn.innerHTML = '&#10095;';
-
             const carousel = document.createElement('div');
             carousel.className = 'item-carousel';
             
-            const channelsToShow = channelsForCategory.slice(0, 20);
-            channelsToShow.forEach(channel => {
-                const card = Yashi.createCard(channel);
-                carousel.appendChild(card);
+            channelsForCategory.slice(0, 20).forEach(channel => {
+                carousel.appendChild(Yashi.createCard(channel));
             });
 
-            prevBtn.addEventListener('click', () => carousel.scrollBy(-carousel.clientWidth * 0.8, 0));
-            nextBtn.addEventListener('click', () => carousel.scrollBy(carousel.clientWidth * 0.8, 0));
+            prevBtn.addEventListener('click', () => carousel.scrollBy({ left: -carousel.clientWidth * 0.8, behavior: 'smooth' }));
+            nextBtn.addEventListener('click', () => carousel.scrollBy({ left: carousel.clientWidth * 0.8, behavior: 'smooth' }));
             carousel.addEventListener('scroll', () => handleCarouselScroll(carousel, prevBtn, nextBtn));
             
-            setTimeout(() => handleCarouselScroll(carousel, prevBtn, nextBtn), 150);
-
-            carouselWrapper.appendChild(prevBtn);
-            carouselWrapper.appendChild(carousel);
-            carouselWrapper.appendChild(nextBtn);
-
-            shelf.appendChild(header);
-            shelf.appendChild(carouselWrapper);
+            carouselWrapper.append(prevBtn, carousel, nextBtn);
+            shelf.append(header, carouselWrapper);
             fragment.appendChild(shelf);
+            
+            setTimeout(() => handleCarouselScroll(carousel, prevBtn, nextBtn), 200);
         });
 
         renderTarget.innerHTML = '';
         renderTarget.appendChild(fragment);
         updateBackButton();
+        setTimeout(() => document.querySelector('.view-all-button, .card')?.focus(), 100);
     };
-
-    const renderCategorySidebar = (categories) => {
-        categoryListContainer.innerHTML = '';
-        categories.forEach(category => {
-            const button = document.createElement('button');
-            button.className = 'sidebar-category-button';
-            
-            const count = categoryCounts[category] || 0;
-            if (count === 0) return;
-
-            button.textContent = `${category} (${count})`;
-            button.dataset.category = category;
-
+    
+    const renderCategorySidebar = () => {
+        const sortedCategories = Object.keys(categoryCounts).sort((a,b) => a.localeCompare(b));
+        categoryListContainer.innerHTML = sortedCategories.map(category => {
+             const count = categoryCounts[category] || 0;
+             if(count === 0) return '';
+             return `<button class="sidebar-category-button" data-category="${category}" tabindex="0">${category} (${count})</button>`
+        }).join('');
+        
+        document.querySelectorAll('.sidebar-category-button').forEach(button => {
             button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                Yashi.navigationStack.push({ type: 'fullGrid', renderFunc: () => renderFullGridView(category) });
                 renderFullGridView(category);
                 toggleSidebar(true);
             });
-            categoryListContainer.appendChild(button);
         });
     };
     
-    const renderCurrentState = () => {
+    const loadAndProcessChannels = async () => {
+        try {
+            allChannels = await db.items.where('type').equals('channel').toArray();
+            categoryCounts = {};
+            allChannels.forEach(channel => {
+                const category = channel.groupTitle || 'Outros';
+                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+            });
+            categoryCounts['Todos'] = allChannels.length;
+            renderShelvesView();
+            renderCategorySidebar();
+        } catch (e) {
+            renderTarget.innerHTML = '<p id="no-results">Falha ao carregar canais.</p>';
+        }
+    };
+    
+    Yashi.reRenderCurrentContent = () => {
         const currentState = Yashi.navigationStack[Yashi.navigationStack.length - 1];
         if (currentState && currentState.renderFunc) {
             currentState.renderFunc();
         }
     };
 
-    const loadAndProcessChannels = async () => {
-        try {
-            allChannels = await db.items.where('type').equals('channel').toArray();
-            
-            categoryCounts = {};
-            allChannels.forEach(channel => {
-                const category = channel.groupTitle && channel.groupTitle.trim() !== '' ? channel.groupTitle.trim() : 'Outros';
-                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-            });
-            categoryCounts['Todos'] = allChannels.length;
+    categoryMenuButton.addEventListener('click', () => toggleSidebar());
+    closeSidebarButton.addEventListener('click', () => toggleSidebar(true));
+    sidebarOverlay.addEventListener('click', () => toggleSidebar(true));
 
-            const sortedSidebarCategories = Object.keys(categoryCounts).sort((a,b) => a.localeCompare(b));
-            renderCategorySidebar(sortedSidebarCategories);
-
-            renderShelvesView();
-
-        } catch (e) {
-            renderTarget.innerHTML = '<p id="no-results">Falha ao carregar canais do banco de dados.</p>';
-            console.error('Erro ao carregar canais:', e);
-        }
-    };
-
-    const performSearch = () => {
+    searchButton.addEventListener('click', () => {
         const query = searchInput.value.trim();
         if (query) {
             localStorage.setItem('yashi_search_query', query);
             window.location.href = 'search.html';
         }
-    };
-    
-    Yashi.reRenderCurrentContent = renderCurrentState;
-
-    categoryMenuButton.addEventListener('click', () => toggleSidebar());
-    closeSidebarButton.addEventListener('click', () => toggleSidebar(true));
-    sidebarOverlay.addEventListener('click', () => toggleSidebar(true));
-
-    searchButton.addEventListener('click', performSearch);
+    });
     searchInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') performSearch();
+        if (e.key === 'Enter') searchButton.click();
     });
 
     loadAndProcessChannels();

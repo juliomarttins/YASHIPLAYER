@@ -1,134 +1,138 @@
-// js/favoritos.js (v7.0 - Adição de Exportar/Importar Favoritos)
+// js/favoritos.js (v9.6B - Correção das capas na visualização em grade)
 document.addEventListener('DOMContentLoaded', async () => {
     if (!window.db) { window.location.href = 'index.html'; return; }
 
     const PAGE_TYPE = 'favorites';
     Yashi.initCommon(PAGE_TYPE);
 
-    const { gridContainer, topBarBackButton, searchInput, searchButton } = Yashi.elements;
-    const renderTarget = gridContainer;
+    const {
+        gridContainer, topBarBackButton, viewButtons,
+        searchButton, categoryMenuButton
+    } = Yashi.elements;
 
+    // Apenas esconde o que não faz sentido na página de favoritos
+    if (searchButton) searchButton.parentElement.style.display = 'none';
+    if (categoryMenuButton) categoryMenuButton.style.display = 'none';
+
+    const viewButtonsContainer = viewButtons[0].parentElement;
+    const renderTarget = gridContainer;
     let allFavorites = [];
 
     const updateBackButton = () => {
-        // Na página de favoritos, o botão de voltar sempre leva para a home
-        topBarBackButton.style.display = 'flex';
-        topBarBackButton.onclick = () => {
-            window.location.href = 'home.html';
+        // Lógica para o botão de voltar na barra de navegação
+        const goBack = () => {
+            if (Yashi.navigationStack.length > 1) {
+                Yashi.navigationStack.pop();
+                const lastState = Yashi.navigationStack[Yashi.navigationStack.length - 1];
+                if (lastState && lastState.renderFunc) {
+                    lastState.renderFunc();
+                }
+            } else {
+                window.location.href = 'home.html';
+            }
         };
+
+        // Atribui a função ao botão e garante visibilidade
+        topBarBackButton.onclick = goBack;
+        topBarBackButton.style.display = 'flex';
     };
 
-    window.renderFavorites = async () => {
+    const renderFullGridView = () => {
+        viewButtonsContainer.classList.remove('disabled');
+        renderTarget.innerHTML = '';
+        
+        // CORREÇÃO: Mapeia o array para passar apenas o objeto 'data' para a função de renderização.
+        const favoriteItems = allFavorites.map(fav => fav.data);
+        Yashi.renderGrid(favoriteItems, renderTarget);
+
+        updateBackButton();
+    };
+    
+    const renderShelvesView = () => {
+        Yashi.navigationStack = [{ type: 'shelfList', renderFunc: renderShelvesView }];
+        
+        viewButtonsContainer.classList.add('disabled');
+        renderTarget.className = 'shelf-container';
         renderTarget.innerHTML = '<div class="content-loader"><div class="loading-yashi" style="font-size: 40px;"><span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span></div></div>';
-        try {
-            allFavorites = await db.favorites.toArray();
-            
-            // Garante que o gridContainer tenha a classe 'grid-container'
-            renderTarget.className = 'grid-container'; 
-            Yashi.applyViewMode(); // Aplica o modo de visualização
 
-            if (allFavorites.length === 0) {
-                renderTarget.innerHTML = '<p id="no-results">Você não possui nenhum item favorito ainda.</p>';
-                return;
+        if (allFavorites.length === 0) {
+            renderTarget.innerHTML = '<p id="no-results">Você não possui nenhum item favorito ainda.</p>';
+            updateBackButton();
+            return;
+        }
+
+        const favoritesByType = {
+            series: allFavorites.filter(fav => fav.type === 'series'),
+            movie: allFavorites.filter(fav => fav.type === 'movie'),
+            channel: allFavorites.filter(fav => fav.type === 'channel')
+        };
+
+        const categoryOrder = ['series', 'movie', 'channel'];
+        const categoryInfo = {
+            series: { title: 'Séries Favoritas', icon: 'fa-solid fa-video' },
+            movie: { title: 'Filmes Favoritos', icon: 'fa-solid fa-film' },
+            channel: { title: 'Canais Favoritos', icon: 'fa-solid fa-tv' }
+        };
+
+        const fragment = document.createDocumentFragment();
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'favorites-header';
+        headerDiv.innerHTML = `
+            <h2>Meus Favoritos</h2>
+            <button id="view-all-favorites-btn" class="action-button">
+                <i class="fas fa-grip"></i> Ver Todos em Grade
+            </button>
+        `;
+        fragment.appendChild(headerDiv);
+
+        categoryOrder.forEach(type => {
+            const favorites = favoritesByType[type];
+            if (favorites.length > 0) {
+                const shelf = document.createElement('div');
+                shelf.className = 'category-shelf';
+                const header = document.createElement('div');
+                header.className = 'shelf-header';
+                header.innerHTML = `
+                    <div class="shelf-title">
+                        <i class="icon ${categoryInfo[type].icon}"></i>
+                        <span>${categoryInfo[type].title} (${favorites.length})</span>
+                    </div>
+                `;
+                const carousel = document.createElement('div');
+                carousel.className = 'item-carousel';
+                favorites.forEach(fav => {
+                    // Aqui já estava correto, passando fav.data
+                    const card = Yashi.createCard(fav.data);
+                    carousel.appendChild(card);
+                });
+                shelf.appendChild(header);
+                shelf.appendChild(carousel);
+                fragment.appendChild(shelf);
             }
+        });
+        
+        renderTarget.innerHTML = '';
+        renderTarget.appendChild(fragment);
 
-            renderTarget.innerHTML = ''; // Limpa o loader
-            allFavorites.forEach(fav => {
-                const card = Yashi.createCard(fav.data); // fav.data contém o objeto original do item
-                renderTarget.appendChild(card);
-            });
-        } catch (e) {
+        document.getElementById('view-all-favorites-btn').addEventListener('click', () => {
+            Yashi.navigationStack.push({ type: 'fullGrid', renderFunc: renderFullGridView });
+            renderFullGridView();
+        });
+
+        updateBackButton();
+    };
+
+    const loadFavorites = async () => {
+        try {
+            allFavorites = await db.favorites.orderBy('name').toArray();
+            renderShelvesView();
+        } catch(e) {
             renderTarget.innerHTML = '<p id="no-results">Falha ao carregar favoritos do banco de dados.</p>';
             console.error('Erro ao carregar favoritos:', e);
         }
     };
 
-    const performSearch = () => {
-        const query = searchInput.value.trim();
-        if (query) {
-            localStorage.setItem('yashi_search_query', query);
-            window.location.href = 'search.html';
-        }
-    };
-
-    // --- Lógica de Exportação e Importação ---
-    const exportButton = document.getElementById('export-favorites-btn');
-    const importButton = document.getElementById('import-favorites-btn');
-    const importInput = document.getElementById('import-favorites-input');
-
-    if (exportButton) {
-        exportButton.addEventListener('click', async () => {
-            try {
-                const favoritesToExport = await db.favorites.toArray();
-                const dataStr = JSON.stringify(favoritesToExport, null, 2); 
-                const blob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'yashi_favorites.json'; 
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url); 
-                
-                alert('Favoritos exportados com sucesso para yashi_favorites.json!');
-            } catch (error) {
-                console.error('Erro ao exportar favoritos:', error);
-                alert('Falha ao exportar favoritos. Verifique o console para mais detalhes.');
-            }
-        });
-    }
-
-    if (importButton && importInput) {
-        importButton.addEventListener('click', () => {
-            importInput.click(); // Simula o clique no input de arquivo oculto
-        });
-
-        importInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) {
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (!Array.isArray(importedData)) {
-                        throw new Error('Formato de arquivo inválido. Esperado um array de favoritos.');
-                    }
-
-                    let importedCount = 0;
-                    for (const item of importedData) {
-                        // Garante que o item tem o formato esperado para um favorito (com 'name' e 'data')
-                        if (item.name && item.data) {
-                            // Usa .put() para inserir ou atualizar (se o 'name' já existir)
-                            await db.favorites.put(item); 
-                            importedCount++;
-                        } else {
-                            console.warn('Item ignorado durante a importação devido a formato inválido:', item);
-                        }
-                    }
-                    alert(`${importedCount} favoritos importados com sucesso!`);
-                    window.renderFavorites(); // Re-renderiza a lista de favoritos
-                } catch (error) {
-                    console.error('Erro ao importar favoritos:', error);
-                    alert(`Falha ao importar favoritos: ${error.message}. Verifique o console.`);
-                }
-            };
-            reader.readAsText(file);
-        });
-    }
-    // --- Fim da Lógica de Exportação e Importação ---
-
     // Inicialização
-    Yashi.reRenderCurrentContent = window.renderFavorites; // Permite que common.js chame renderFavorites
-    updateBackButton();
-    renderFavorites();
-
-    searchButton.addEventListener('click', performSearch);
-    searchInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') performSearch();
-    });
+    loadFavorites();
 });
