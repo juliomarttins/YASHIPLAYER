@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingStatus = document.getElementById('loading-status');
     const loadingDetails = document.getElementById('loading-details');
 
+    // --- CÓDIGO DO PROXY INTEGRADO ---
+    // URL do seu serviço de proxy pessoal na Vercel.
+    const proxyUrl = 'https://proxy-1eg35vvho-julios-projects-2b4f0ac3.vercel.app/api/proxy?url=';
+
     // Função de callback para atualizar a UI durante o carregamento
     const onProgressCallback = (progress) => {
         if (progress.status) {
@@ -28,19 +32,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Adiciona o evento de clique ao botão principal
     loadButton.addEventListener('click', () => {
-        const url = urlInput.value.trim();
+        let url = urlInput.value.trim();
         
         // Valida se a URL foi inserida
         if (!url) {
             errorMessage.textContent = 'Por favor, insira a URL da sua lista M3U.';
             return;
         }
+
+        // --- MÁGICA DO PROXY ACONTECE AQUI ---
+        // Se a URL for http, usa o proxy. Se for https, usa diretamente.
+        if (url.startsWith('http://')) {
+            console.log("URL HTTP detectada. Usando proxy...");
+            url = proxyUrl + encodeURIComponent(url);
+        }
         
         // Esconde o formulário e exibe o loader
         loginForm.style.display = 'none';
         loginLoader.style.display = 'flex';
         
-        // Inicia o processo de carregamento a partir da URL
+        // Inicia o processo de carregamento a partir da URL (original ou com proxy)
         loadFromUrl(url);
     });
 
@@ -54,12 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadFromUrl = async (url) => {
         try {
             onProgressCallback({ status: 'Buscando lista da URL...', details: 'Conectando...' });
-            const response = await fetch(url);
+            
+            // Usamos 'no-cache' para garantir que a lista seja sempre a mais recente
+            const response = await fetch(url, { cache: 'no-cache' });
+
             if (!response.ok) throw new Error(`Erro de rede: ${response.statusText}`);
             const m3uText = await response.text();
             
             onProgressCallback({ status: 'Configurando...', details: 'Salvando fonte de dados...' });
-            await saveSourceToDb('url', url); 
+            
+            // Salva a URL ORIGINAL, sem o proxy, para futuras sincronizações
+            await saveSourceToDb('url', urlInput.value.trim()); 
             
             await YashiSync.processAndStoreM3U(m3uText, onProgressCallback); 
             
