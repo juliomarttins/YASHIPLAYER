@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="fav.png" type="image/png">
+    <title>YASHI PLAYER - Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index_home.css">
+</head>
+<body class="home-body">
+    <div class="home-container">
+        <div class="dashboard-layout">
+            <nav class="home-nav">
+                <a href="canais/canais.html" class="nav-button">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>Canais</span>
+                </a>
+                <a href="filmes/filmes.html" class="nav-button"> 
+                    <i class="fa-solid fa-film"></i>
+                    <span>Filmes</span>
+                </a>
+                <a href="series/series.html" class="nav-button">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Séries</span>
+                </a>
+                <div class="small-actions-grid">
+                    <a href="continue-assistindo/continue_assistindo.html" class="action-button small-action-button"> 
+                        <i class="fa-solid fa-play-circle"></i>
+                        <span>Continue Assistindo</span>
+                    </a>
+                    <a href="favoritos/favoritos.html" class="action-button small-action-button"> 
+                        <i class="fa-solid fa-heart"></i>
+                        <span>Salvos</span>
+                    </a>
+                    <a href="avaliados/avaliados.html" class="action-button small-action-button"> 
+                        <i class="fa-solid fa-medal"></i>
+                        <span>Avaliações</span>
+                    </a>
+                    <a href="backup/backup.html" class="action-button small-action-button"> 
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                        <span>Backup & Restauração</span>
+                    </a>
+                </div>
+            </nav>
+
+            <aside class="actions-column">
+                <button class="action-button sync-button" id="sync-button">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <div class="button-text-container">
+                        <span class="main-text">Sincronizar</span>
+                        <span class="sub-text" id="last-sync-time">Última: Carregando...</span>
+                    </div>
+                </button>
+                <a href="pesquisa/search.html" class="action-button"> 
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Pesquisar</span>
+                </a>
+                <a href="novidades/novidades.html" class="action-button" id="novidades-button"> 
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>Novidades v1.4!</span>
+                </a>
+                <img src="logo.png" alt="YASHI PLAYER Logo" class="home-logo-small">
+            </aside>
+        </div>
+        
+        <footer class="footer-notice">
+            © 2025 YASHI PLAYER. Todos os direitos reservados. Este software é um reprodutor de mídia e não fornece conteúdo. O usuário é o único responsável pelas listas que utiliza, sendo obrigatório o uso de mídias licenciadas. A reprodução não autorizada deste player ou de seu design é proibida.
+        </footer>
+    </div>
+
+    <script defer src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script defer src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script defer src="js/db.js"></script>
+    <script defer src="js/common.js"></script>
+    <script defer src="js/sync_v2.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica se está logado
+            db.config.get('m3u_source_type').then(sourceType => {
+                if (!sourceType) {
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Lógica do botão de sincronização
+            const syncButton = document.getElementById('sync-button');
+            if (syncButton) {
+                syncButton.addEventListener('click', () => {
+                    if (window.YashiSync && typeof window.YashiSync.run === 'function') {
+                        window.YashiSync.run(syncButton);
+                    } else {
+                        console.error('Falha Crítica: YashiSync.js não foi carregado corretamente.');
+                    }
+                });
+            }
+
+            // Mostra a última data de sincronização
+            const lastSyncTimeElement = document.getElementById('last-sync-time');
+            if (lastSyncTimeElement) {
+                db.config.get('last_successful_sync').then(result => {
+                    if (result && result.value) {
+                        const date = new Date(result.value);
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const hour = date.getHours().toString().padStart(2, '0');
+                        const minute = date.getMinutes().toString().padStart(2, '0');
+                        const formattedDate = `${hour}:${minute} - ${day}/${month}`;
+                        lastSyncTimeElement.textContent = `Última: ${formattedDate}`;
+                    } else {
+                        lastSyncTimeElement.textContent = 'Nenhuma sincronização feita';
+                    }
+                }).catch(error => {
+                    console.error("Erro ao buscar data de sincronização:", error);
+                    lastSyncTimeElement.textContent = 'Última: Erro';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../fav.png" type="image/png">
+    <title>YASHI PLAYER - Contato</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="style_contato.css">
+</head>
+<body class="content-body">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <img src="../logo.png" alt="Logo" class="top-bar-logo" onclick="window.location.href='../home.html'">
+            <button class="home-button" onclick="window.location.href='../home.html'" title="Voltar para Home">
+                <i class="fas fa-home"></i>
+            </button>
+        </div>
+    </div>
+
+    <main id="main-content" class="contato-container">
+        <h1>Sua Voz é Essencial</h1>
+        <p class="subtitle">A evolução do Yashi Player depende da sua opinião. Escolha o canal ideal para falar conosco.</p>
+
+        <div class="cards-container">
+            <div class="contact-links">
+                <div class="action-card small-card">
+                    <i class="fa-brands fa-whatsapp icon whatsapp-icon"></i>
+                    <h2>Suporte via WhatsApp</h2>
+                    <p>Precisa de uma resposta rápida? Fale diretamente com o desenvolvedor. Ideal para suporte, dúvidas urgentes e feedback direto.</p>
+                    <a href="https://wa.me/5562998413382?text=Ol%C3%A1!%20Gostaria%20de%20falar%20sobre%20o%20Yashi%20Player." target="_blank" class="contato-button whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i> Enviar Mensagem
+                    </a>
+                </div>
+                <div class="action-card small-card">
+                    <i class="fa-brands fa-telegram icon telegram-icon"></i>
+                    <h2>Converse via Telegram</h2>
+                    <p>Fale diretamente com a gente. Ideal para suporte, dúvidas e sugestões, sem a necessidade de entrar em um grupo.</p>
+                    <a href="https://t.me/+5562994164778" target="_blank" class="contato-button telegram">
+                        <i class="fa-brands fa-telegram"></i> Conversar
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-card form-card">
+                <i class="fa-solid fa-envelope-open-text icon"></i>
+                <h2>Formulário de Contato</h2>
+                <p>Para assuntos mais estruturados, o formulário é a melhor opção. Ele nos ajuda a organizar e responder suas solicitações com mais eficiência.</p>
+                <p class="form-warning" style="color: #dc3545; font-weight: bold; text-align: center; margin-bottom: 20px;">
+                    AVISO: O formulário de contato está temporariamente inativo. Por favor, envie sua mensagem diretamente para: <a href="mailto:maretins10@gmail.com" style="color: #dc3545; text-decoration: underline;">maretins10@gmail.com</a>
+                </p>
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-name">Seu Nome</label>
+                            <input type="text" id="contact-name" required disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Seu E-mail (para resposta)</label>
+                            <input type="email" id="contact-email" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-subject">Assunto</label>
+                        <select id="contact-subject" required disabled>
+                            <option value="Dúvida Geral">Dúvida Geral</option>
+                            <option value="Sugestão de Recurso">Sugestão de Recurso</option>
+                            <option value="Relatório de Bug/Erro">Relatório de Bug/Erro</option>
+                            <option value="Proposta de Parceria">Proposta de Parceria</option>
+                            <option value="Outro Assunto">Outro Assunto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-message">Mensagem</label>
+                        <textarea id="contact-message" rows="5" required disabled></textarea>
+                    </div>
+                    <button type="submit" class="contato-button submit" disabled>
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="action-card full-width">
+            <i class="fa-solid fa-fire-flame-curved icon"></i>
+            <h2>Mantenha a Chama Acesa</h2>
+            <p>O Yashi Player nasceu da paixão por uma experiência de mídia limpa, rápida e <strong>sem anúncios</strong>. E queremos que continue assim. Cada café que você paga se transforma em horas de código e novas funcionalidades. Você não está apenas doando, está investindo na ferramenta que usa.</p>
+            <div class="pix-info">
+                <p><strong>Nome:</strong> Julio Cesar P. Martins</p>
+                <p><strong>Instituição:</strong> AstroPay</p>
+                <p class="pix-key-container">
+                    <strong>Chave:</strong> <span id="pix-key">3894648b-2333-4f43-9e24-5714895a1abb</span>
+                </p>
+                <button id="copy-pix-btn" class="contato-button copy-pix">
+                    <i class="fa-solid fa-copy"></i> Copiar Chave PIX
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+    
+    <script src="engine_contato.js"></script>
+</body>
+</html>

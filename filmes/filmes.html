@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../fav.png" type="image/png">
+    <title>YASHI PLAYER - Filmes</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="style_filmes.css">
+</head>
+<body class="content-body">
+    <main id="main-content"></main>
+
+    <div id="player-view">
+        <div id="player-container">
+            <div class="player-header">
+                <button class="back-from-player"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h2 id="player-title"></h2>
+            </div>
+            <video id="player" playsinline controls></video>
+            <button id="player-prev-button" class="player-nav-button prev" title="Anterior"><i class="fas fa-backward-step"></i></button>
+            <button id="player-next-button" class="player-nav-button next" title="Próximo"><i class="fas fa-forward-step"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/common.js"></script>
+    
+    <script src="engine_filmes.js"></script>
+</body>
+</html>

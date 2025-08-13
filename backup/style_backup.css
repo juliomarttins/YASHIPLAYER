@@ -1,0 +1,125 @@
+/* /BACKUP/style_backup.css */
+/* Estilos consolidados para o módulo de Backup */
+
+/* --- VARIÁVEIS GLOBAIS E RESETS --- */
+:root {
+    --yashi-cyan: #00F0F0;
+    --background-color: #0d1117;
+    --surface-color: #161b22;
+    --border-color: #30363d;
+    --text-color: #c9d1d9;
+    --text-secondary-color: #8b949e;
+    --font-family: 'Inter', sans-serif;
+    --toast-error-bg: #2c1a1d;
+    --toast-error-border: #dc3545;
+    --toast-success-bg: #1c2b22;
+    --toast-success-border: #28a745;
+}
+html { font-size: clamp(14px, 1.2vw, 18px); }
+body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); margin: 0; font-size: 1rem; }
+* { box-sizing: border-box; }
+.content-body { padding: 25px; }
+
+/* --- BARRA SUPERIOR SIMPLES --- */
+.top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 25px; }
+.top-bar-left { display: flex; align-items: center; gap: 12px; }
+.top-bar-logo { height: 35px; cursor: pointer; flex-shrink: 0; }
+.home-button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary-color); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease-in-out; }
+.home-button:hover { color: var(--yashi-cyan); border-color: var(--yashi-cyan); }
+
+/* --- ESTILOS ESPECÍFICOS DA PÁGINA --- */
+.backup-container {
+    max-width: 900px;
+    margin: 40px auto 0 auto;
+    text-align: center;
+}
+.backup-container h1 {
+    font-size: 2rem;
+    color: var(--yashi-cyan);
+    margin-bottom: 10px;
+}
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary-color);
+    margin-bottom: 40px;
+}
+.cards-container {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.action-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    flex-grow: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+.action-card .icon {
+    font-size: 2.5rem;
+    color: var(--yashi-cyan);
+    margin-bottom: 20px;
+    align-self: center;
+}
+.action-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+.action-card p {
+    color: var(--text-secondary-color);
+    line-height: 1.6;
+    flex-grow: 1;
+}
+.backup-button {
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.backup-button:hover { transform: translateY(-3px); }
+.backup-button.export {
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+}
+.backup-button.export:hover { box-shadow: 0 5px 20px rgba(0, 240, 240, 0.4); }
+.backup-button.import {
+    background-color: transparent;
+    color: var(--yashi-cyan);
+    border: 2px solid var(--yashi-cyan);
+}
+.backup-button.import:hover { background-color: var(--yashi-cyan); color: var(--background-color); }
+
+/* --- SISTEMA DE NOTIFICAÇÃO E MODAIS --- */
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast { background-color: var(--surface-color); color: var(--text-color); padding: 15px 20px; border-radius: 8px; border-left: 5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateX(100%); transition: all 0.4s ease-in-out; display: flex; align-items: center; gap: 10px; }
+.toast.show { opacity: 1; transform: translateX(0); }
+.toast.success { border-left-color: var(--toast-success-border); background-color: var(--toast-success-bg); }
+.toast.success::before { font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f058"; color: var(--toast-success-border); }
+.toast.error { border-left-color: var(--toast-error-border); background-color: var(--toast-error-bg); }
+.toast.error::before { font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f06a"; color: var(--toast-error-border); }
+#confirmation-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9998; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+#confirmation-modal-overlay.active { opacity: 1; visibility: visible; }
+.confirmation-modal { background: var(--surface-color); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s; text-align: center; }
+#confirmation-modal-overlay.active .confirmation-modal { transform: scale(1); }
+.confirmation-modal-content { margin-bottom: 25px; }
+.confirmation-modal-content p { margin: 0; font-size: 1rem; line-height: 1.6; color: var(--text-color); }
+.confirmation-modal-content ul { list-style: none; padding: 0; margin: 15px 0; text-align: left; display: inline-block; }
+.confirmation-modal-content li { margin-bottom: 5px; }
+.confirmation-modal-buttons { display: flex; justify-content: center; gap: 15px; }
+.modal-button.confirm-button { background-color: var(--toast-error-border); color: #fff; }
+.modal-button.cancel-button { background-color: var(--border-color); color: var(--text-color); }
