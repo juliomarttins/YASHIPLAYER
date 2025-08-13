@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASHI PLAYER - Pesquisa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/search.css">
+</head>
+<body class="content-body">
+    <main id="main-content">
+        <div class="search-header">
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="top-bar-logo" onclick="window.location.href='home.html'">
+                <button class="home-button" onclick="window.location.href='home.html'" title="Voltar para Home">
+                    <i class="fas fa-home"></i>
+                </button>
+                <div class="view-buttons">
+                    <button class="view-button" data-view-mode="view-list" title="Lista"><i class="fas fa-list"></i></button>
+                    <button class="view-button" data-view-mode="view-details" title="Detalhes"><i class="fas fa-bars"></i></button>
+                    <button class="view-button" data-view-mode="view-small" title="Grade Pequena"><i class="fas fa-grip"></i></button>
+                    <button class="view-button" data-view-mode="view-medium" title="Grade Média"><i class="fas fa-table-cells"></i></button>
+                    <button class="view-button" data-view-mode="view-large" title="Grade Grande"><i class="fas fa-table-cells-large"></i></button>
+                </div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Pesquisar por filmes, séries ou canais...">
+                <button id="search-button-page" title="Pesquisar"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div id="category-filters" class="hidden"></div>
+
+        <div id="results-container" class="grid-container">
+            <p class="search-prompt">Digite algo para iniciar a pesquisa.</p>
+        </div>
+    </main>
+
+    <div id="player-view">
+        <div id="player-container">
+            <div class="player-header">
+                <button class="back-from-player"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h2 id="player-title"></h2>
+            </div>
+            <video id="player" playsinline controls></video>
+            <button id="player-prev-button" class="player-nav-button prev" title="Anterior"><i class="fas fa-backward-step"></i></button>
+            <button id="player-next-button" class="player-nav-button next" title="Próximo"><i class="fas fa-forward-step"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/search.js"></script>
+</body>
+</html>

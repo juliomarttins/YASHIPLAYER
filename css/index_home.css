@@ -18,14 +18,24 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+<<<<<<< HEAD
     overflow: hidden;
     box-sizing: border-box;
+=======
+}
+.login-body::before {
+    content: none;
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .login-container {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
+<<<<<<< HEAD
     padding: 15px 30px; 
+=======
+    padding: 30px; /* Reduzido de 40px */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     border-radius: 12px;
     text-align: center;
     width: 90%;
@@ -34,6 +44,7 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+<<<<<<< HEAD
     
     max-height: 90vh;
     overflow-y: auto;
@@ -67,6 +78,26 @@
 .login-container p {
     color: var(--text-secondary-color);
     margin-bottom: 15px;
+=======
+    /* min-height removido para permitir que o conteúdo dite a altura */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#login-form {
+    width: 100%; /* Garante que o formulário ocupe o espaço do container */
+}
+
+.login-logo {
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 15px; /* Reduzido de 20px */
+}
+.login-container p {
+    color: var(--text-secondary-color);
+    margin-bottom: 25px; /* Reduzido de 30px */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     margin-top: 0;
 }
 .login-container input[type="text"] {
@@ -80,11 +111,30 @@
     box-sizing: border-box;
     font-size: 16px;
 }
+<<<<<<< HEAD
 
 #loadButton {
     width: 60%;
     padding: 19px;
     margin-top: 15px;
+=======
+.separator { margin: 15px 0; color: var(--text-secondary-color); }
+.file-label {
+    display: block;
+    padding: 12px;
+    background: rgba(13, 17, 23, 0.8);
+    border: 2px dashed var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.file-label:hover { background-color: var(--surface-color); border-color: var(--yashi-cyan); }
+input[type="file"] { display: none; }
+#loadButton {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px; /* Reduzido de 25px */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     border: none;
     border-radius: 50px;
     background: var(--yashi-cyan);
@@ -97,32 +147,52 @@
 #loadButton:hover { background: var(--yashi-cyan-glow); color: var(--background-color); transform: scale(1.02); }
 
 .copyright-notice {
+<<<<<<< HEAD
     font-size: 11px;
     color: var(--text-secondary-color);
     margin-top: 15px;
+=======
+    font-size: 11px; /* Reduzido o tamanho da fonte */
+    color: var(--text-secondary-color);
+    margin-top: 20px;
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     max-width: 90%;
     margin-left: auto;
     margin-right: auto;
     line-height: 1.4;
+<<<<<<< HEAD
     opacity: 0.7;
+=======
+    opacity: 0.7; /* Reduzida a opacidade para ser menos visível */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 #error-message {
     color: #ff7b72;
+<<<<<<< HEAD
     margin-top: 10px;
     min-height: 20px;
+=======
+    margin-top: 15px;
+    height: 20px;
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     font-weight: bold;
 }
 
 /* --- ESTILOS DO LOADER (TELA DE CARREGAMENTO) --- */
 #login-loader {
+<<<<<<< HEAD
     display: none;
+=======
+    display: none; /* Inicia oculto */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
 #loading-status {
+<<<<<<< HEAD
     color: var(--text-color);
     font-size: 18px;
     font-weight: 500;
@@ -144,6 +214,11 @@
     max-width: 85%;
     line-height: 1.5;
     opacity: 0.9;
+=======
+    color: var(--text-secondary-color);
+    font-size: 16px;
+    transition: opacity 0.3s ease-in-out; /* Adicionado para efeito de fade */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 /* --- NOVOS ESTILOS DA PÁGINA HOME --- */
@@ -186,7 +261,11 @@
     flex: 3;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+<<<<<<< HEAD
     grid-template-rows: repeat(2, 1fr);
+=======
+    grid-template-rows: repeat(2, 1fr); /* 2 linhas para os botões grandes e a small-actions-grid */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     gap: 20px;
 }
 
@@ -203,7 +282,11 @@
     gap: 10px;
     transition: transform 0.2s, background-color 0.2s;
     border: none;
+<<<<<<< HEAD
     min-height: 150px;
+=======
+    min-height: 150px; /* Garante altura mínima para os slots da grid */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .nav-button:hover {
@@ -214,7 +297,11 @@
 .nav-button i {
     font-size: 40px;
     color: var(--background-color);
+<<<<<<< HEAD
     transition: text-shadow 0.3s ease-in-out;
+=======
+    transition: text-shadow 0.3s ease-in-out; /* Adicionado para efeito de glow */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .nav-button:hover i {
@@ -235,6 +322,7 @@
     justify-content: flex-start;
 }
 
+<<<<<<< HEAD
 .small-actions-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -249,11 +337,37 @@
 .small-actions-grid .action-button {
     border: none;
     border-radius: 8px;
+=======
+/* Novo container para os 4 botões menores, agora dentro do grid principal da home-nav */
+.small-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Duas colunas */
+    gap: 10px; /* Espaçamento entre os botões */
+    padding: 0; /* REMOVIDO o padding para que os botões internos preencham totalmente o espaço */
+    height: 100%; /* Ocupa toda a altura do seu container nav-button */
+    width: 100%; /* Ocupa toda a largura do seu container nav-button */
+    box-sizing: border-box; /* Inclui padding na largura/altura total */
+    background-color: transparent; /* Garante fundo transparente */
+}
+
+/* Removido o efeito de hover no grupo para que cada botão tenha seu próprio hover */
+/* .small-actions-grid:hover {
+    transform: scale(1.03);
+    background-color: var(--yashi-cyan-glow);
+} */
+
+
+/* Estilos para os botões individuais dentro do small-actions-grid */
+.small-actions-grid .action-button {
+    border: none; /* Remove a borda */
+    border-radius: 8px; /* Borda arredondada igual aos nav-buttons */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     text-decoration: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+<<<<<<< HEAD
     gap: 8px;
     font-weight: 500;
     transition: transform 0.2s, background-color 0.2s;
@@ -265,10 +379,25 @@
     background-color: var(--yashi-cyan);
     color: var(--background-color);
     font-family: inherit; 
+=======
+    gap: 8px; /* Espaçamento entre ícone e texto */
+    font-weight: 500;
+    transition: transform 0.2s, background-color 0.2s; /* Transição INDIVIDUAL para todas as propriedades */
+    cursor: pointer;
+    width: 100%;
+    height: 100%; /* Preenche o espaço disponível no small-actions-grid */
+    box-sizing: border-box;
+    padding: 10px; /* Padding interno para afastar o texto das bordas */
+    
+    /* Cores iguais aos nav-buttons */
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .small-actions-grid .action-button:hover {
     transform: scale(1.03);
+<<<<<<< HEAD
     background-color: var(--yashi-cyan-glow);
 }
 
@@ -279,10 +408,24 @@
 .small-actions-grid .action-button i {
     font-size: 28px;
     color: var(--background-color);
+=======
+    background-color: var(--yashi-cyan-glow); /* Efeito de brilho ao passar o mouse */
+}
+
+/* CORREÇÃO AQUI: Garante que a estrela de favoritos seja sólida */
+.small-actions-grid .action-button i.fa-solid.fa-star {
+    color: var(--background-color); /* Cor da estrela sólida, igual ao texto */
+}
+
+.small-actions-grid .action-button i {
+    font-size: 28px; /* Tamanho do ícone */
+    color: var(--background-color); /* Cor do ícone igual aos nav-buttons */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     transition: text-shadow 0.3s ease-in-out;
 }
 
 .small-actions-grid .action-button:hover i {
+<<<<<<< HEAD
     text-shadow: 0 0 12px rgba(13, 17, 23, 0.7);
 }
 
@@ -295,6 +438,21 @@
 }
 
 .action-button:not(.small-actions-grid .action-button) {
+=======
+    text-shadow: 0 0 12px rgba(13, 17, 23, 0.7); /* Efeito de brilho no ícone */
+}
+
+.small-actions-grid .action-button span {
+    font-size: 0.8em; /* Reduzindo um pouco mais a fonte para dar mais espaço */
+    color: var(--background-color); /* Cor do texto igual aos nav-buttons */
+    text-align: center;
+    line-height: 1.2; /* Aumenta um pouco o espaçamento entre linhas */
+}
+
+
+/* Os estilos abaixo são para os action-buttons "normais" */
+.action-button:not(.small-actions-grid .action-button) { /* Aplica-se apenas aos botões que NÃO são small-action-button dentro de small-actions-grid */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     background-color: transparent;
     border: 2px solid var(--yashi-cyan);
     color: var(--yashi-cyan);
@@ -317,10 +475,13 @@
     background-color: var(--yashi-cyan);
     color: var(--background-color);
 }
+<<<<<<< HEAD
 .action-button:not(.small-actions-grid .action-button):hover .sub-text {
     color: var(--background-color);
     opacity: 0.7;
 }
+=======
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 
 .action-button:not(.small-actions-grid .action-button) i {
     font-size: 20px;
@@ -333,6 +494,7 @@
     font-weight: 500;
 }
 
+<<<<<<< HEAD
 /* Estilos para o botão de Sincronizar com subtítulo */
 .sync-button .button-text-container {
     display: flex;
@@ -362,22 +524,41 @@
     color: var(--yashi-cyan);
 }
 
+=======
+/* CORREÇÃO AQUI: Garante que o ícone de sincronizar seja sólido e não tenha cor de estrela vazia */
+#sync-button i.fa-solid.fa-rotate-right {
+    color: var(--yashi-cyan); /* Cor original do ícone de sincronizar */
+}
+
+
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 .home-logo-small {
     max-width: 160px;
     height: auto;
     margin-top: auto;
     align-self: center;
+<<<<<<< HEAD
     opacity: 0.8;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
+=======
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .home-logo-small:hover {
     opacity: 1;
+<<<<<<< HEAD
     transform: scale(1.05);
     filter: drop-shadow(0 0 15px var(--yashi-cyan-glow));
 }
 
+=======
+}
+
+/* --- ESTILO PARA VERSÃO DO SITE ADICIONADO --- */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 .version-display {
     display: block;
     text-align: center;
@@ -397,6 +578,7 @@
     line-height: 1.5;
 }
 
+<<<<<<< HEAD
 #continue-watching-shelf {
     margin-top: 40px;
     margin-bottom: 20px;
@@ -416,29 +598,82 @@
 }
 
 .card-content { 
+=======
+/* --- NOVOS ESTILOS PARA CONTINUE ASSISTINDO SHELF --- */
+#continue-watching-shelf {
+    margin-top: 40px; /* Espaço acima da prateleira */
+    margin-bottom: 20px; /* Espaço abaixo da prateleira */
+}
+
+/* Os estilos .category-shelf, .shelf-header, .shelf-title, .shelf-title .icon,
+   .view-all-button, .carousel-wrapper, .item-carousel, .scroll-button
+   já estão definidos em canais.css/filmes.css.
+   Para evitar duplicação, vamos garantir que esses arquivos CSS sejam carregados.
+   Se não, teremos que duplicá-los aqui ou em um arquivo comum para prateleiras.
+   Assumo que base.css ou os outros arquivos serão carregados para a home se necessário.
+   Por enquanto, base.css já contém alguns elementos genéricos.
+   
+   Apenas adicionando o estilo para o overlay de progresso.
+*/
+
+.card { /* Modifica o card existente no base.css para suportar o overlay */
+    position: relative;
+    /* Certifica-se que a área clicável preenche o card */
+    display: flex; /* Adicionado */
+    flex-direction: column; /* Adicionado */
+}
+
+.card-clickable-area { /* Novo elemento para o clique */
+    flex-grow: 1; /* Permite que a área clicável preencha o espaço */
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Para posicionar o overlay de progresso */
+}
+
+.card-content { /* Se o card tiver um div para conteúdo, garanta que ele ocupe espaço */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
+<<<<<<< HEAD
+=======
+/* Overlay de progresso */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 .progress-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
+<<<<<<< HEAD
     height: 8px; 
     background-color: rgba(0, 0, 0, 0.7); 
     z-index: 2; 
+=======
+    height: 8px; /* Altura da barra de progresso */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo da barra */
+    z-index: 2; /* Acima da imagem, abaixo do título e botões */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 }
 
 .progress-bar {
     height: 100%;
+<<<<<<< HEAD
     background-color: var(--yashi-cyan); 
     width: 0%; 
     transition: width 0.3s ease-in-out;
 }
 
+=======
+    background-color: var(--yashi-cyan); /* Cor da barra de progresso */
+    width: 0%; /* Será ajustado via JS */
+    transition: width 0.3s ease-in-out;
+}
+
+
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 /* Responsividade */
 @media (max-width: 768px) {
     .dashboard-layout {
@@ -446,8 +681,13 @@
     }
     .home-nav {
         order: 1;
+<<<<<<< HEAD
         grid-template-columns: repeat(2, 1fr); 
         grid-template-rows: auto; 
+=======
+        grid-template-columns: repeat(2, 1fr); /* Mantém 2 colunas para botões grandes e small-actions-grid */
+        grid-template-rows: auto; /* Altura automática para se ajustar */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
     }
     .actions-column {
         order: 2;
@@ -455,6 +695,7 @@
         flex-wrap: wrap;
         justify-content: center;
     }
+<<<<<<< HEAD
     .small-actions-grid {
         grid-template-columns: repeat(2, 1fr); 
         width: 100%; 
@@ -469,10 +710,28 @@
         font-size: 22px; 
     }
     .small-actions-grid .action-button span { 
+=======
+    /* Adapta a grid de botões menores para mobile */
+    .small-actions-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas em telas menores */
+        width: 100%; /* Ocupa a largura total */
+        min-height: auto; /* Remove altura mínima para se ajustar ao conteúdo */
+        padding: 5px; /* Ajusta padding para mobile */
+    }
+    .small-actions-grid .action-button {
+        height: 70px; /* Ajusta altura para mobile */
+        font-size: 0.75rem; /* Ajusta fonte para mobile */
+    }
+    .small-actions-grid .action-button i {
+        font-size: 22px; /* Ajusta ícone para mobile */
+    }
+    .small-actions-grid .action-button span { /* Adicionado para quebrar a linha em títulos longos */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
         white-space: normal;
         overflow: visible;
         text-overflow: unset;
     }
+<<<<<<< HEAD
     .action-button:not(.small-actions-grid .action-button) {
     }
 }
@@ -547,3 +806,6 @@
 .m3u-requirements .status-tag.not-required {
     color: var(--text-secondary-color); /* Branco/Cinza */
 }
+=======
+    .action-button:not(.small-actions-grid .action-button) { /* Mantém o estilo original dos botões maiores */
+>>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1

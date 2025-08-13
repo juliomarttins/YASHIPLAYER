@@ -1,0 +1,131 @@
+/* /css/shelves.css (v9.6B - CORRIGIDO: Estilos para Setas de Navegação) */
+
+/* Container principal para as prateleiras */
+.shelf-container {
+    display: flex;
+    flex-direction: column;
+    gap: 35px; /* Espaço entre as prateleiras */
+}
+
+/* Prateleira individual (cabeçalho + carrossel) */
+.category-shelf {
+    width: 100%;
+}
+
+/* Cabeçalho da prateleira (Título + Botão Ver Todos) */
+.shelf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 5px; /* Leve preenchimento para alinhar com os cards */
+}
+
+.shelf-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.shelf-title .icon {
+    color: var(--yashi-cyan);
+    font-size: 1.1rem;
+}
+
+.view-all-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+    margin-left: 15px; /* Espaço entre o título e o botão */
+}
+
+.view-all-button:hover {
+    background-color: var(--surface-color);
+    border-color: var(--yashi-cyan);
+    color: var(--yashi-cyan);
+    transform: scale(1.05);
+}
+
+/* --- ESTILOS PARA AS SETAS DE NAVEGAÇÃO --- */
+.carousel-wrapper {
+    position: relative;
+}
+
+.item-carousel {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: 5px;
+    margin: -5px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+}
+.item-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+}
+
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(13, 17, 23, 0.8);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0; /* Começa invisível */
+    visibility: hidden;
+}
+
+.carousel-wrapper:hover .scroll-button {
+    opacity: 0.8; /* Aparece no hover do wrapper */
+    visibility: visible;
+}
+
+.scroll-button.prev {
+    left: -20px;
+}
+.scroll-button.next {
+    right: -20px;
+}
+.scroll-button:hover {
+    opacity: 1 !important;
+    background-color: var(--yashi-cyan);
+    color: var(--background-color);
+    border-color: var(--yashi-cyan);
+    transform: translateY(-50%) scale(1.1);
+}
+.scroll-button:disabled {
+    opacity: 0 !important;
+    visibility: hidden;
+    cursor: not-allowed;
+}
+
+.item-carousel .card {
+    flex-shrink: 0;
+    width: 150px;
+}
+
+/* Regra para quebra de linha inteligente nos títulos de temporada */
+.season-card .card-title {
+    white-space: normal; /* Permite que o texto quebre a linha */
+    text-align: center;  /* Centraliza o texto quebrado em duas linhas */
+}
