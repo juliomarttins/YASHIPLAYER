@@ -1,6 +1,315 @@
 ## avaliados\avaliados.html
 ```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../fav.png" type="image/png">
+    <title>YASHI PLAYER - Itens Avaliados</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="style_avaliados.css">
+</head>
+<body class="content-body">
+    <main id="main-content"></main>
+
+    <div id="player-view">
+        <div id="player-container">
+            <div class="player-header">
+                <button class="back-from-player"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h2 id="player-title"></h2>
+            </div>
+            <video id="player" playsinline controls></video>
+            <div id="autoplay-notice" class="autoplay-notice">Aguarde, a reprodução retomará automaticamente...</div>
+            <button id="player-prev-button" class="player-nav-button prev" title="Anterior"><i class="fas fa-backward-step"></i></button>
+            <button id="player-next-button" class="player-nav-button next" title="Próximo"><i class="fas fa-forward-step"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/common.js"></script>
+    
+    <script src="engine_avaliados.js"></script>
+</body>
+</html>
+```
+
+
+## avaliados\engine_avaliados.js
+```javascript
+// /AVALIADOS/engine_avaliados.js
+// Motor Específico para o Módulo de Itens Avaliados
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!window.db || !window.Yashi) {
+        console.error("Motores globais (db.js, common.js) não encontrados.");
+        alert("Erro crítico. Recarregue a página.");
+        return;
+    }
+
+    const PAGE_TYPE = 'avaliados';
+    Yashi.initCommon(PAGE_TYPE);
+
+    const { gridContainer, topBarBackButton } = Yashi.elements;
+    
+    // Esconde elementos não utilizados nesta página
+    if (Yashi.elements.searchButton) Yashi.elements.searchButton.parentElement.style.display = 'none';
+    if (Yashi.elements.categoryMenuButton) Yashi.elements.categoryMenuButton.style.display = 'none';
+    
+    const renderTarget = gridContainer;
+
+    function createCard(ratedItem) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('tabindex', '0');
+
+        const displayItem = ratedItem.data;
+        if (!displayItem) {
+             return document.createComment(' Objeto de item avaliado inválido ');
+        }
+        
+        const defaultImg = '../capa.png';
+        const title = displayItem.name;
+        let image = displayItem.logo || defaultImg;
+
+        // Adiciona o selo com a nota do usuário
+        const ratingBadge = document.createElement('div');
+        ratingBadge.className = 'rating-badge';
+        ratingBadge.innerHTML = `<i class="fa-solid fa-star"></i> ${ratedItem.userRating}`;
+        
+        card.innerHTML = `
+            <img loading="lazy" src="${image}" class="card-img" alt="${title}" onerror="this.onerror=null;this.src='${defaultImg}';">
+            <div class="card-title">${title}</div>`;
+        card.prepend(ratingBadge);
+
+        card.addEventListener('click', () => {
+            Yashi.showSynopsisModal(
+                displayItem, 
+                () => { // onContinueCallback
+                    sessionStorage.setItem('yashi_nav_origin', 'avaliados');
+                    localStorage.setItem('yashi_deep_link_series_name', displayItem.name);
+                    window.location.href = '../series/series.html';
+                },
+                (newRating) => { // onRatingChangeCallback
+                    Yashi.closeSynopsisModal();
+                    setTimeout(() => {
+                        loadAndRenderRatedItems();
+                    }, 350);
+                }
+            );
+        });
+
+        return card;
+    }
+    
+    const loadAndRenderRatedItems = async () => {
+        renderTarget.innerHTML = '<div class="content-loader"><div class="loading-yashi" style="font-size: 40px;"><span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span></div></div>';
+        try {
+            const allRatings = await db.movieRatings.orderBy('rating').reverse().toArray();
+            
+            const ratedMovies = [];
+            const ratedSeries = [];
+
+            if (allRatings.length > 0) {
+                for (const rating of allRatings) {
+                    let itemData = await db.series.get(rating.itemId);
+                    if (itemData) {
+                        ratedSeries.push({ data: itemData, userRating: rating.rating });
+                    } else {
+                        itemData = await db.items.where('name').equals(rating.itemId).first();
+                        if (itemData && itemData.type === 'movie') {
+                            ratedMovies.push({ data: itemData, userRating: rating.rating });
+                        }
+                    }
+                }
+            }
+            
+            renderTarget.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            const categories = [
+                { title: 'Filmes Avaliados', icon: 'fa-solid fa-film', items: ratedMovies },
+                { title: 'Séries Avaliadas', icon: 'fa-solid fa-video', items: ratedSeries }
+            ];
+
+            let hasContent = false;
+            categories.forEach(category => {
+                if (category.items.length > 0) {
+                    hasContent = true;
+                    const categorySection = document.createElement('div');
+                    categorySection.className = 'category-section';
+                    categorySection.innerHTML = `
+                        <h2 class="category-title">
+                            <div><i class="icon ${category.icon}"></i> ${category.title} <span>(${category.items.length})</span></div>
+                        </h2>`;
+                    
+                    const grid = document.createElement('div');
+                    grid.className = 'grid-container';
+                    category.items.forEach(item => grid.appendChild(createCard(item)));
+                    
+                    categorySection.appendChild(grid);
+                    fragment.appendChild(categorySection);
+                }
+            });
+            
+            if (hasContent) {
+                renderTarget.appendChild(fragment);
+            } else {
+                 renderTarget.innerHTML = `<p id="no-results">Você ainda não avaliou nenhum filme ou série.</p>`;
+            }
+
+        } catch(e) {
+            console.error("Falha ao carregar itens avaliados:", e);
+            renderTarget.innerHTML = '<p id="no-results">Ocorreu um erro ao carregar seus itens avaliados.</p>';
+        }
+    };
+    
+    if (topBarBackButton) {
+        topBarBackButton.onclick = () => {
+            window.location.href = '../home.html';
+        };
+    }
+
+    loadAndRenderRatedItems();
+});
+```
+
+
+## avaliados\style_avaliados.css
+```css
+/* /AVALIADOS/style_avaliados.css */
+
+/* --- VARIÁVEIS GLOBAIS E RESETS --- */
+:root {
+    --yashi-cyan: #00F0F0;
+    --yashi-cyan-glow: #80FFFF;
+    --background-color: #0d1117;
+    --surface-color: #161b22;
+    --border-color: #30363d;
+    --text-color: #c9d1d9;
+    --text-secondary-color: #8b949e;
+    --font-family: 'Inter', sans-serif;
+    --rating-gold: #FFD700;
+}
+html { font-size: clamp(14px, 1.2vw, 18px); }
+body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); margin: 0; font-size: 1rem; }
+* { box-sizing: border-box; }
+.content-body { padding: 25px; }
+
+/* --- BARRA SUPERIOR --- */
+main {
+    padding-top: 80px;
+    margin-top: -80px;
+}
+.top-bar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 25px; 
+    margin: -25px -25px 25px -25px;
+    gap: 15px; 
+    flex-wrap: wrap;
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.top-bar-left, .top-bar-right { display: flex; align-items: center; gap: 12px; }
+.top-bar-right { flex-grow: 1; justify-content: flex-end; }
+.top-bar-logo { height: 35px; cursor: pointer; }
+.home-button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary-color); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease-in-out; }
+.home-button:hover { color: var(--yashi-cyan); border-color: var(--yashi-cyan); }
+#top-bar-back-button { display: none; }
+.cover-size-buttons { display: flex; align-items: center; gap: 5px; background-color: var(--background-color); padding: 5px; border-radius: 8px; }
+.size-label { font-size: 0.8rem; color: var(--text-secondary-color); margin-right: 5px; margin-left: 5px; font-weight: 500; }
+.size-button { background: none; border: none; color: var(--text-secondary-color); width: 35px; height: 35px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.size-button:hover { color: var(--text-color); }
+.size-button.active { background-color: var(--yashi-cyan); color: var(--background-color); }
+
+/* --- SEÇÃO DE CATEGORIA --- */
+.category-section {
+    margin-bottom: 40px;
+}
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.category-title > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.category-title .icon {
+    color: var(--yashi-cyan);
+}
+.category-title span {
+    font-size: 1.1rem;
+    color: var(--text-secondary-color);
+}
+
+/* --- GRID E CARDS --- */
+.grid-container { display: grid; gap: 1.25rem; }
+main[data-cover-size="micro"] .grid-container { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); }
+main[data-cover-size="small"] .grid-container { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+main[data-cover-size="medium"] .grid-container { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+main[data-cover-size="large"] .grid-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+.card { background-color: var(--surface-color); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; border: 1px solid transparent; position: relative; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); }
+.card:focus, .card:focus-visible { outline: none; box-shadow: 0 0 15px var(--yashi-cyan-glow); border-color: var(--yashi-cyan); }
+.card-img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; background-color: #21262d; }
+.card.default-logo .card-img { object-fit: contain; padding: 1.5rem; }
+.card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
+
+/* --- NOVO SELO DE AVALIAÇÃO --- */
+.rating-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--rating-gold);
+    color: var(--rating-gold);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-shadow: 0 0 5px var(--rating-gold);
+}
+.rating-badge .fa-star {
+    font-size: 0.8rem;
+}
+
+#no-results { text-align: center; color: var(--text-secondary-color); padding: 50px 0; font-size: 1.1rem; grid-column: 1 / -1; }
+.loading-yashi span { display: inline-block; font-weight: bold; animation: wave 1.6s infinite; animation-delay: calc(.1s * var(--i)); }
+@keyframes wave { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-15px); color: var(--yashi-cyan); } }
+.content-loader { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; min-height: 50vh; }
 ```
 
 
@@ -771,8 +1080,8 @@ main[data-cover-size="large"] .grid-container { grid-template-columns: repeat(au
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
 .favorite-button { position: absolute; top: 8px; right: 8px; background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.favorite-button:hover { background-color: rgba(0, 240, 240, 0.2); color: var(--yashi-cyan); }
-.favorite-button.active { color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+.favorite-button:hover { background-color: rgba(229, 9, 20, 0.15); color: #E50914; }
+.favorite-button.active { color: #E50914; text-shadow: 0 0 8px rgba(229, 9, 20, 0.7); }
 
 /* --- PLAYER DE VÍDEO --- */
 #player-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -1408,17 +1717,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderTarget = gridContainer;
     let allPlaybackHistory = [];
 
-    function renderGrid(items) {
+    function renderGrid(items, gridElement) {
         Yashi.lastRenderedData = items;
-        renderTarget.innerHTML = '';
-        renderTarget.className = 'grid-container';
+        gridElement.innerHTML = '';
         
         if (!items || items.length === 0) {
-            renderTarget.innerHTML = '<p id="no-results">Você não possui nenhum item no histórico de reprodução.</p>';
+            gridElement.innerHTML = '<p id="no-results">Você não possui nenhum item no histórico de reprodução.</p>';
             return;
         }
         items.forEach(item => {
-            renderTarget.appendChild(createCard(item));
+            gridElement.appendChild(createCard(item));
         });
         
         Yashi.updateBackButton();
@@ -1497,11 +1805,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
                 card.style.transform = 'scale(0.9)';
                 card.style.opacity = '0';
-                setTimeout(() => {
-                    card.remove();
-                    if (renderTarget && renderTarget.childElementCount === 0) {
-                        renderTarget.innerHTML = '<p id="no-results">Você não possui nenhum item no histórico de reprodução.</p>';
-                    }
+                setTimeout(async () => {
+                    await renderPlaybackHistory(); // Re-render the whole view to update count and state
                 }, 300);
             }, { confirmText: 'Sim, Remover' });
         });
@@ -1533,7 +1838,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTarget.innerHTML = '<div class="content-loader"><div class="loading-yashi" style="font-size: 40px;"><span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span></div></div>';
         try {
             allPlaybackHistory = await db.playbackHistory.orderBy('timestamp').reverse().toArray();
-            renderGrid(allPlaybackHistory);
+            
+            renderTarget.innerHTML = '';
+            renderTarget.className = '';
+
+            const historyHeader = document.createElement('div');
+            historyHeader.className = 'history-header';
+
+            const titleElement = document.createElement('h2');
+            titleElement.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> Continue Assistindo <span>(${allPlaybackHistory.length})</span>`;
+            historyHeader.appendChild(titleElement);
+            
+            if (allPlaybackHistory.length > 0) {
+                const clearButton = document.createElement('button');
+                clearButton.className = 'clear-history-button';
+                clearButton.innerHTML = `<i class="fa-solid fa-trash-can"></i> Limpar Tudo`;
+                clearButton.addEventListener('click', () => {
+                    Yashi.showConfirmationModal(
+                        `<p>Tem certeza que deseja apagar <strong>todo</strong> o seu histórico?</p><p style="color: #dc3545;">Esta ação não pode ser desfeita.</p>`,
+                        async () => {
+                            await db.playbackHistory.clear();
+                            await renderPlaybackHistory();
+                            Yashi.showToast('Histórico limpo com sucesso.', 'success');
+                        },
+                        { confirmText: 'Sim, Limpar' }
+                    );
+                });
+                historyHeader.appendChild(clearButton);
+            }
+            
+            renderTarget.appendChild(historyHeader);
+            
+            const gridWrapper = document.createElement('div');
+            gridWrapper.className = 'grid-container';
+            renderTarget.appendChild(gridWrapper);
+
+            renderGrid(allPlaybackHistory, gridWrapper);
+
         } catch (e) {
             renderTarget.innerHTML = '<p id="no-results">Falha ao carregar histórico de reprodução.</p>';
         }
@@ -1586,6 +1927,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     --toast-error-border: #dc3545;
     --toast-success-bg: #1c2b22;
     --toast-success-border: #28a745;
+    --delete-red: #dc3545;
 }
 
 html { font-size: clamp(14px, 1.2vw, 18px); }
@@ -1633,6 +1975,53 @@ main {
 .clear-search-button { right: 40px; }
 .hidden { display: none; }
 
+/* --- NOVO CABEÇALHO DO HISTÓRICO --- */
+.history-header {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+.history-header h2 {
+    margin: 0;
+    font-size: inherit;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.history-header h2 i {
+    color: var(--yashi-cyan);
+}
+.history-header h2 span {
+    font-size: 1.1rem;
+    color: var(--text-secondary-color);
+}
+.clear-history-button {
+    background-color: transparent;
+    border: 1px solid var(--delete-red);
+    color: var(--delete-red);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.clear-history-button:hover {
+    background-color: var(--delete-red);
+    color: #fff;
+    transform: scale(1.05);
+}
+
 /* --- GRID E CARDS --- */
 .grid-container { display: grid; gap: 1.25rem; }
 main[data-cover-size="micro"] .grid-container { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); }
@@ -1648,8 +2037,8 @@ main[data-cover-size="large"] .grid-container { grid-template-columns: repeat(au
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
 .favorite-button { position: absolute; top: 8px; right: 8px; background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.favorite-button:hover { background-color: rgba(0, 240, 240, 0.2); color: var(--yashi-cyan); }
-.favorite-button.active { color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+.favorite-button:hover { background-color: rgba(229, 9, 20, 0.15); color: #E50914; }
+.favorite-button.active { color: #E50914; text-shadow: 0 0 8px rgba(229, 9, 20, 0.7); }
 .remove-history-button { position: absolute; bottom: 8px; right: 8px; background-color: rgba(220, 53, 69, 0.7); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 14px; cursor: pointer; z-index: 6; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; opacity: 0; }
 .card:hover .remove-history-button { opacity: 1; }
 .remove-history-button:hover { background-color: rgba(220, 53, 69, 1); transform: scale(1.1); }
@@ -2071,7 +2460,7 @@ body { background-color: var(--background-color); color: var(--text-color); font
 .rating-display-slider {
     font-size: 1.1rem;
     color: var(--text-secondary-color);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2082,35 +2471,20 @@ body { background-color: var(--background-color); color: var(--text-color); font
     color: var(--text-color);
     font-weight: bold;
     font-size: 1.2rem;
+    min-width: 100px;
+    text-align: center;
 }
-#user-rating-value .fa-heart {
-    color: #E50914; /* Coração Vermelho */
+#user-rating-value .fa-star {
+    color: #FFD700;
     font-size: 1.1rem;
     vertical-align: middle;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
 }
 .rating-slider-wrapper {
     display: flex;
     align-items: center;
     gap: 15px;
-}
-#clear-rating-btn {
-    background: none;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary-color);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-#clear-rating-btn:hover {
-    background-color: var(--toast-error-border);
-    color: white;
-    border-color: var(--toast-error-border);
-    transform: scale(1.1);
+    margin-bottom: 5px;
 }
 
 /* Customização do Slider */
@@ -2118,49 +2492,85 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 10px;
-    background: linear-gradient(to right, var(--yashi-cyan) var(--slider-progress, 0%), var(--border-color) var(--slider-progress, 0%));
-    border-radius: 5px;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
     outline: none;
     cursor: pointer;
-    transition: background 0.2s;
+    background-image: linear-gradient(to right, #FFD700, #FFB800);
+    background-size: var(--slider-progress, 0%) 100%;
+    background-repeat: no-repeat;
 }
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
-    background: white;
-    border: 3px solid var(--yashi-cyan);
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #FFD700;
     border-radius: 50%;
     cursor: grab;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 input[type="range"]:active::-webkit-slider-thumb {
     transform: scale(1.2);
     cursor: grabbing;
+    box-shadow: 0 0 12px #FFD700;
 }
-/* Firefox */
 input[type="range"]::-moz-range-track {
     width: 100%;
-    height: 10px;
-    background: linear-gradient(to right, var(--yashi-cyan) var(--slider-progress, 0%), var(--border-color) var(--slider-progress, 0%));
-    border-radius: 5px;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
     outline: none;
     cursor: pointer;
 }
+input[type="range"]::-moz-range-progress {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #FFD700, #FFB800);
+}
 input[type="range"]::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    background: white;
-    border: 3px solid var(--yashi-cyan);
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #FFD700;
     border-radius: 50%;
     cursor: grab;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 input[type="range"]:active::-moz-range-thumb {
     cursor: grabbing;
+    box-shadow: 0 0 12px #FFD700;
 }
+
+/* Régua Numérica */
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px; /* Alinha o "1" com o início da barra */
+    padding-right: 10px; /* Alinha o "10" com o fim da barra */
+    margin-top: 5px;
+}
+.rating-labels .label-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-secondary-color);
+    flex-basis: 0; /* Permite que o flex-grow funcione corretamente */
+    flex-grow: 1;
+}
+.rating-labels .label-item .tick {
+    font-style: normal;
+    color: var(--border-color);
+    margin-bottom: 2px;
+}
+.rating-labels .label-item:first-child { align-items: flex-start; }
+.rating-labels .label-item:last-child { align-items: flex-end; }
+
 
 @media (max-width: 768px) {
     .synopsis-modal { flex-direction: column; max-height: 90vh; }
@@ -2836,8 +3246,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const header = document.createElement('h2');
                 header.className = 'category-title';
-                header.innerHTML = `
-                    <div><i class="icon ${categoryInfo.icon}"></i> ${categoryInfo.title} <span>(${items.length})</span></div>`;
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.innerHTML = `<i class="icon ${categoryInfo.icon}"></i> ${categoryInfo.title} <span>(${items.length})</span>`;
+                header.appendChild(titleDiv);
+
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'category-actions';
 
                 if (categoryInfo.sortLabel) {
                     const sortButton = document.createElement('button');
@@ -2852,8 +3267,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                             window.location.href = '../series/series.html';
                         });
                     });
-                    header.appendChild(sortButton);
+                    actionsContainer.appendChild(sortButton);
                 }
+
+                const clearButton = document.createElement('button');
+                clearButton.className = 'clear-category-button';
+                clearButton.innerHTML = '<i class="fa-solid fa-trash-can"></i> Limpar';
+                clearButton.title = `Limpar todos os itens de ${categoryInfo.title}`;
+                clearButton.addEventListener('click', () => {
+                    Yashi.showConfirmationModal(
+                        `<p>Tem certeza que deseja remover <strong>TUDO</strong> de "${categoryInfo.title}"?</p><p style="color:#dc3545;">Esta ação não pode ser desfeita.</p>`,
+                        async () => {
+                            await db.favorites.where('type').equals(categoryInfo.type).delete();
+                            await loadAndRenderFavorites();
+                            Yashi.showToast(`Categoria "${categoryInfo.title}" limpa.`, 'success');
+                        },
+                        { confirmText: "Sim, Limpar" }
+                    );
+                });
+                actionsContainer.appendChild(clearButton);
+
+                header.appendChild(actionsContainer);
                 
                 const grid = document.createElement('div');
                 grid.className = 'grid-container';
@@ -2962,6 +3396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     --toast-error-border: #dc3545;
     --toast-success-bg: #1c2b22;
     --toast-success-border: #28a745;
+    --delete-red: #dc3545;
 }
 html { font-size: clamp(14px, 1.2vw, 18px); }
 body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); margin: 0; font-size: 1rem; }
@@ -3028,10 +3463,12 @@ main {
     font-size: 1.1rem;
     color: var(--text-secondary-color);
 }
-.sort-button {
-    background-color: transparent;
-    border: 1px solid var(--yashi-cyan);
-    color: var(--yashi-cyan);
+.category-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sort-button, .clear-category-button {
     font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
@@ -3042,10 +3479,25 @@ main {
     align-items: center;
     gap: 8px;
 }
+.sort-button {
+    background-color: transparent;
+    border: 1px solid var(--yashi-cyan);
+    color: var(--yashi-cyan);
+}
 .sort-button:hover {
     background-color: rgba(0, 240, 240, 0.1);
     color: var(--yashi-cyan-glow);
     border-color: var(--yashi-cyan-glow);
+    transform: scale(1.05);
+}
+.clear-category-button {
+    background-color: transparent;
+    border: 1px solid var(--delete-red);
+    color: var(--delete-red);
+}
+.clear-category-button:hover {
+    background-color: var(--delete-red);
+    color: #fff;
     transform: scale(1.05);
 }
 
@@ -3537,9 +3989,12 @@ main[data-cover-size="large"] .grid-container { grid-template-columns: repeat(au
 .card.default-logo .card-img { object-fit: contain; padding: 1.5rem; }
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
-.favorite-button { position: absolute; top: 8px; right: 8px; background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.favorite-button:hover { background-color: rgba(0, 240, 240, 0.2); color: var(--yashi-cyan); }
-.favorite-button.active { color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+
+.favorite-button { background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.favorite-button:hover { background-color: rgba(229, 9, 20, 0.15); color: #E50914; }
+.favorite-button.active { color: #E50914; text-shadow: 0 0 8px rgba(229, 9, 20, 0.7); }
+.card > .favorite-button { position: absolute; top: 8px; right: 8px; left: auto; }
+
 .favorite-button { position: relative; }
 .favorite-button::after {
     content: attr(data-tooltip);
@@ -3735,7 +4190,7 @@ main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem;
                 </a>
                 <a href="novidades/novidades.html" class="action-button" id="novidades-button"> 
                     <i class="fa-solid fa-bullhorn"></i>
-                    <span>Novidades v1.3!</span>
+                    <span>Novidades v1.4!</span>
                 </a>
                 <img src="logo.png" alt="YASHI PLAYER Logo" class="home-logo-small">
             </aside>
@@ -4309,7 +4764,7 @@ const Yashi = {
         if (overlay) overlay.classList.remove('active');
     },
 
-    async showSynopsisModal(item, onContinueCallback) {
+    async showSynopsisModal(item, onContinueCallback, onRatingChangeCallback) {
         const overlay = document.getElementById('synopsis-modal-overlay');
         if (!overlay) return;
 
@@ -4329,7 +4784,7 @@ const Yashi = {
             
             const cached = await db.metadataCache.get(item.name);
             if (cached) {
-                this.renderSynopsisContent(detailsContainer, cached, item, onContinueCallback);
+                this.renderSynopsisContent(detailsContainer, cached, item, onContinueCallback, false, onRatingChangeCallback);
                 posterImg.src = cached.posterUrl || item.logo || '../capa.png';
                 return;
             }
@@ -4359,7 +4814,7 @@ const Yashi = {
             };
 
             await db.metadataCache.put(metadata);
-            this.renderSynopsisContent(detailsContainer, metadata, item, onContinueCallback);
+            this.renderSynopsisContent(detailsContainer, metadata, item, onContinueCallback, false, onRatingChangeCallback);
             posterImg.src = metadata.posterUrl;
 
         } catch (error) {
@@ -4370,11 +4825,11 @@ const Yashi = {
                     <p>${error.message}</p>
                     <div class="synopsis-actions"></div>
                 </div>`;
-            this.renderSynopsisContent(detailsContainer, null, item, onContinueCallback, true);
+            this.renderSynopsisContent(detailsContainer, null, item, onContinueCallback, true, onRatingChangeCallback);
         }
     },
 
-    renderSynopsisContent(container, data, originalItem, onContinueCallback, isError = false) {
+    renderSynopsisContent(container, data, originalItem, onContinueCallback, isError = false, onRatingChangeCallback) {
         let actionButtonHTML = '';
 
         if (originalItem.seasons && typeof onContinueCallback === 'function') {
@@ -4392,8 +4847,19 @@ const Yashi = {
                     <span id="user-rating-value">Nenhuma</span>
                 </div>
                 <div class="rating-slider-wrapper">
-                    <input type="range" id="rating-slider" min="0" max="10" step="1" value="0">
-                    <button id="clear-rating-btn" title="Remover Avaliação">&times;</button>
+                    <input type="range" id="rating-slider" min="0" max="10" step="0.5" value="0">
+                </div>
+                <div class="rating-labels">
+                    <span class="label-item"><i class="tick">|</i>1</span>
+                    <span class="label-item"><i class="tick">|</i>2</span>
+                    <span class="label-item"><i class="tick">|</i>3</span>
+                    <span class="label-item"><i class="tick">|</i>4</span>
+                    <span class="label-item"><i class="tick">|</i>5</span>
+                    <span class="label-item"><i class="tick">|</i>6</span>
+                    <span class="label-item"><i class="tick">|</i>7</span>
+                    <span class="label-item"><i class="tick">|</i>8</span>
+                    <span class="label-item"><i class="tick">|</i>9</span>
+                    <span class="label-item"><i class="tick">|</i>10</span>
                 </div>
             </div>`;
 
@@ -4437,7 +4903,7 @@ const Yashi = {
             };
             db.favorites.get(originalItem.name).then(fav => updateFavButtonState(!!fav));
             favBtn.addEventListener('click', async () => {
-                const isFavorited = favBtn.classList.contains('active');
+                const isFavorited = isFavorited;
                 const itemType = originalItem.seasons ? 'series' : (originalItem.type || 'movie');
                 try {
                     if (isFavorited) { await db.favorites.delete(originalItem.name); } 
@@ -4449,14 +4915,16 @@ const Yashi = {
 
         const ratingSlider = container.querySelector('#rating-slider');
         const ratingValueDisplay = container.querySelector('#user-rating-value');
-        const clearRatingBtn = container.querySelector('#clear-rating-btn');
+        
+        // Botão de limpar foi removido do HTML, então não precisamos mais dele no JS.
+        // const clearRatingBtn = container.querySelector('#clear-rating-btn'); 
         
         const updateSliderVisuals = (value) => {
             const numValue = Number(value);
             if (numValue === 0) {
                 ratingValueDisplay.textContent = 'Nenhuma';
             } else {
-                ratingValueDisplay.innerHTML = `${numValue} <i class="fa-solid fa-heart"></i>`;
+                ratingValueDisplay.innerHTML = `${numValue.toLocaleString('pt-BR')} <i class="fa-solid fa-star"></i>`;
             }
             ratingSlider.value = numValue;
             ratingSlider.style.setProperty('--slider-progress', `${(numValue / 10) * 100}%`);
@@ -4473,22 +4941,20 @@ const Yashi = {
         ratingSlider.addEventListener('change', async () => {
             const ratingValue = Number(ratingSlider.value);
             try {
+                // Se o usuário deslizar para 0, tratamos como "limpar"
                 if (ratingValue === 0) {
                     await db.movieRatings.delete(originalItem.name);
                     Yashi.showToast('Avaliação removida.', 'success');
                 } else {
                     await db.movieRatings.put({ itemId: originalItem.name, rating: ratingValue, timestamp: Date.now() });
-                    Yashi.showToast(`Filme avaliado com nota ${ratingValue}!`, 'success');
+                    Yashi.showToast(`Item avaliado com nota ${ratingValue}!`, 'success');
+                }
+                if (typeof onRatingChangeCallback === 'function') {
+                    onRatingChangeCallback(ratingValue);
                 }
             } catch (error) {
                 Yashi.showToast('Erro ao salvar sua avaliação.', 'error');
             }
-        });
-
-        clearRatingBtn.addEventListener('click', () => {
-            ratingSlider.value = 0;
-            ratingSlider.dispatchEvent(new Event('change'));
-            updateSliderVisuals(0);
         });
     }
 };
@@ -5027,6 +5493,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mainContent = document.getElementById('main-content');
 
     const changelogData = [
+        {
+            version: "v1.4 - O Refinamento da Experiência",
+            date: "13 de Agosto, 2025",
+            notes: [
+                { icon: "fa-solid fa-star-half-stroke", text: "<strong class='changelog-highlight-green'>Novo Sistema de Avaliação:</strong> Implementado um sistema de notas de 0 a 10 com incrementos de meio ponto (ex: 8,5). As avaliações agora usam um ícone de estrela dourada para melhor clareza visual." },
+                { icon: "fa-solid fa-medal", text: "<strong class='changelog-highlight'>Nova Página 'Meus Votos':</strong> Uma nova seção foi criada para listar todos os filmes e séries que você avaliou, convenientemente organizados da maior para a menor nota." },
+                { icon: "fa-solid fa-wand-magic-sparkles", text: "<strong class='changelog-highlight'>Interface Dinâmica:</strong> Ao alterar ou remover a nota de um item na página 'Meus Votos', a lista agora se atualiza automaticamente, sem a necessidade de recarregar a página." },
+                { icon: "fa-solid fa-ruler-combined", text: "<strong class='changelog-highlight'>Calibração e Polimento:</strong> O controle deslizante de notas foi redesenhado para ser mais elegante e preciso, com uma régua numérica perfeitamente calibrada com a posição do seletor." },
+                { icon: "fa-solid fa-bug-slash", text: "<strong class='changelog-highlight-blue'>Correções Gerais:</strong> Resolvido um bug que impedia os filmes de aparecerem na página de avaliados e removidos botões redundantes para uma interface mais limpa." }
+            ]
+        },
         {
             version: "v1.3 - A Organização Definitiva",
             date: "12 de Agosto, 2025",
@@ -6230,8 +6707,8 @@ body { background-color: var(--background-color); color: var(--text-color); font
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #main-content[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
 .favorite-button { position: absolute; top: 8px; right: 8px; background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.favorite-button:hover { background-color: rgba(0, 240, 240, 0.2); color: var(--yashi-cyan); }
-.favorite-button.active { color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+.favorite-button:hover { background-color: rgba(229, 9, 20, 0.15); color: #E50914; }
+.favorite-button.active { color: #E50914; text-shadow: 0 0 8px rgba(229, 9, 20, 0.7); }
 .remove-from-history-button { position: absolute; bottom: 8px; right: 8px; background-color: rgba(220, 53, 69, 0.7); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 14px; cursor: pointer; z-index: 6; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; opacity: 0; }
 .card:hover .remove-from-history-button { opacity: 1; }
 .remove-from-history-button:hover { background-color: rgba(220, 53, 69, 1); transform: scale(1.1); }
@@ -6255,7 +6732,7 @@ body { background-color: var(--background-color); color: var(--text-color); font
 #player-title { font-size: 1.2rem; }
 .player-nav-button { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(13, 17, 23, 0.6); color: var(--text-secondary-color); border: 2px solid var(--border-color); border-radius: 50%; width: 50px; height: 50px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2147483647; transition: all 0.2s ease-in-out; opacity: 0; visibility: hidden; }
 #player-container:hover .player-nav-button.visible { opacity: 0.7; }
-.player-nav-button:hover { opacity: 1 !important; background-color: var(--yashi-cyan); color: var(--background-color); border-color: var(--yashi-cyan); box-shadow: 0 0 15px var(--yasi-cyan-glow); }
+.player-nav-button:hover { opacity: 1 !important; background-color: var(--yashi-cyan); color: var(--background-color); border-color: var(--yasi-cyan-glow); }
 .player-nav-button.prev { left: 20px; }
 .player-nav-button.next { right: 20px; }
 .content-loader, #no-results { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 50vh; color: var(--text-secondary-color); text-align: center; }
@@ -6837,9 +7314,11 @@ main[data-cover-size="large"] .grid-container { grid-template-columns: repeat(au
 .card.default-logo .card-img { object-fit: contain; padding: 1.5rem; }
 .card-title { padding: 0.75rem; font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 main[data-cover-size="micro"] .card-title { font-size: 0.75rem; padding: 0.5rem; }
-.favorite-button { position: absolute; top: 8px; right: 8px; background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.favorite-button:hover { background-color: rgba(0, 240, 240, 0.2); color: var(--yashi-cyan); }
-.favorite-button.active { color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+.favorite-button { background-color: rgba(13, 17, 23, 0.7); color: var(--text-secondary-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.favorite-button:hover { background-color: rgba(229, 9, 20, 0.15); color: #E50914; }
+.favorite-button.active { color: #E50914; text-shadow: 0 0 8px rgba(229, 9, 20, 0.7); }
+.card > .favorite-button { position: absolute; top: 8px; right: 8px; left: auto; }
+
 .favorite-button { position: relative; }
 .favorite-button::after {
     content: attr(data-tooltip);

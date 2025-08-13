@@ -1,99 +1,132 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="fav.png" type="image/png">
-    <title>YASHI PLAYER - Login</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/index_home.css">
+    <title>Processador de Lista M3U</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            text-align: center;
+        }
+        .container {
+            padding: 40px;
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        h1 {
+            color: #00F0F0; /* Cor principal do seu site */
+            margin-bottom: 25px;
+        }
+        p {
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #00F0F0;
+            color: #121212;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        a:hover {
+            background-color: #00c0c0;
+            transform: scale(1.05);
+        }
+        #status {
+            margin-top: 20px;
+            font-style: italic;
+            color: #aaa;
+        }
+        a.hidden {
+            display: none;
+        }
+    </style>
 </head>
-<body class="login-body">
-    <div class="login-container">
-        <div id="login-form">
-            <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
-            <p>Insira a URL da sua lista M3U para começar.</p>
-            <input type="text" id="urlInput" placeholder="Cole seu link aqui (verifique http ou https)">
-            
-            <button id="loadButton">Carregar Player</button>
+<body>
 
-            <div class="m3u-requirements">
-                <p>Para a melhor experiência, sua lista deve conter os atributos abaixo. Consulte seu provedor ou <a href="contato/contato.html">compre uma lista com nossos parceiros</a>.</p>
-                <ul>
-                    <li><span class="attr-name">Título do Conteúdo</span> <span class="status-tag mandatory">[Obrigatório]</span></li>
-                    <li><span class="attr-name">group-title</span> <span class="status-tag mandatory">[Obrigatório]</span></li>
-                    <li><span class="attr-name">tvg-logo</span> <span class="status-tag recommended">[Recomendado]</span></li>
-                </ul>
-            </div>
+    <div class="container">
+        <h1>Processador de Lista M3U</h1>
+        <p>Este script irá processar sua lista M3U, tornando os links HTTP compatíveis com páginas HTTPS.</p>
+        <div id="status">Clique no botão para iniciar...</div>
+        <a href="#" id="processButton">1. Iniciar Processamento</a>
+        <a href="#" id="downloadLink" class="hidden" download="lista_convertida.m3u">2. Baixar Lista Convertida</a>
+    </div>
 
-            <div class="copyright-notice">
-                Este aplicativo é um reprodutor de mídia e não fornece ou armazena conteúdo. Todo o conteúdo é carregado a partir das listas fornecidas pelo próprio usuário.
-            </div>
-            <div id="error-message"></div>
-        </div>
-        <div id="login-loader">
-            <div class="loading-yashi">
-                <span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span>
-            </div>
-            <div id="loading-status">Iniciando...</div>
-            <div id="loading-details"></div>
-            <p class="loader-note">Estamos preparando tudo para você. Este processo pode levar alguns segundos, mas garantirá que seu conteúdo carregue muito mais rápido depois. Vale a pena esperar!</p>
-        </div>
-    </div>
-    
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/sync_v2.js"></script>
-    <script src="js/login.js"></script>
+    <script>
+        // URL do seu arquivo M3U original no GitHub.
+        // IMPORTANTE: Altere para o caminho correto do seu arquivo.
+        // Se o arquivo 'lista.m3u' está na mesma pasta que este 'index.html', o caminho é só 'lista.m3u'.
+        const m3uUrl = 'lista.m3u';
+
+        // URL do seu serviço de proxy pessoal na Vercel.
+        const proxyUrl = 'https://proxy-1eg35vvho-julios-projects-2b4f0ac3.vercel.app/api/proxy?url=';
+
+        const processButton = document.getElementById('processButton');
+        const downloadLink = document.getElementById('downloadLink');
+        const statusDiv = document.getElementById('status');
+
+        processButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            try {
+                statusDiv.textContent = 'Buscando sua lista M3U...';
+                
+                // 1. Busca o conteúdo do arquivo M3U
+                const response = await fetch(m3uUrl);
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar o arquivo: ${response.statusText}`);
+                }
+                const m3uContent = await response.text();
+
+                statusDiv.textContent = 'Processando os links...';
+
+                // 2. Processa o conteúdo
+                const lines = m3uContent.split('\n');
+                const newLines = lines.map(line => {
+                    // Verifica se a linha é um link de stream HTTP
+                    if (line.trim().startsWith('http://')) {
+                        // Monta a nova URL com o proxy
+                        const originalUrl = line.trim();
+                        // O proxy precisa da URL original encodada para funcionar corretamente
+                        const newUrl = proxyUrl + encodeURIComponent(originalUrl);
+                        console.log(`Convertendo: ${originalUrl} -> ${newUrl}`);
+                        return newUrl;
+                    }
+                    // Mantém as outras linhas (como #EXTINF) intactas
+                    return line;
+                });
+
+                const newM3uContent = newLines.join('\n');
+
+                // 3. Cria um link de download para o novo arquivo M3U
+                const blob = new Blob([newM3uContent], { type: 'application/vnd.apple.mpegurl' });
+                const url = URL.createObjectURL(blob);
+
+                downloadLink.href = url;
+                downloadLink.classList.remove('hidden');
+                processButton.classList.add('hidden');
+                statusDiv.textContent = 'Pronto! Sua lista foi convertida com sucesso.';
+
+            } catch (error) {
+                statusDiv.textContent = `Falha no processo: ${error.message}`;
+                console.error(error);
+            }
+        });
+    </script>
+
 </body>
-=======
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YASHI PLAYER - Login</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"></noscript>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/index_home.css">
-</head>
-<body class="login-body">
-    <div class="login-container">
-        <div id="login-form">
-            <img src="logo.png" alt="YASHI PLAYER Logo" class="login-logo">
-            <p>Insira sua lista M3U / M3U8 para começar.</p>
-            <input type="text" id="urlInput" placeholder="URL da lista M3U">
-            <div class="separator">ou</div>
-            <label for="fileInput" class="file-label">
-                <span id="file-name">Selecionar arquivo .m3u</span>
-                <input type="file" id="fileInput" accept=".m3u,.m3u8">
-            </label>
-            <button id="loadButton">Carregar Player</button>
-            <div class="copyright-notice">
-                Este aplicativo é um reprodutor de mídia e não fornece ou armazena conteúdo. Todo o conteúdo é carregado a partir das listas fornecidas pelo próprio usuário.
-            </div>
-            <div id="error-message"></div>
-        </div>
-        <div id="login-loader">
-            <div class="loading-yashi">
-                <span>Y</span><span>A</span><span>S</span><span>H</span><span>I</span>
-            </div>
-            <div id="loading-status">Iniciando...</div>
-        </div>
-    </div>
-    
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/sync.js"></script>
-    <script src="js/login.js"></script>
-</body>
->>>>>>> 547020a5a19c041a9c3eab1f54447811bec5a6f1
 </html>
