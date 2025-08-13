@@ -16,10 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingStatus = document.getElementById('loading-status');
     const loadingDetails = document.getElementById('loading-details');
 
-    // --- CÓDIGO DO PROXY INTEGRADO ---
-    // URL do seu serviço de proxy pessoal na Vercel.
-    const proxyUrl = 'https://proxy-1eg35vvho-julios-projects-2b4f0ac3.vercel.app/api/proxy?url=';
-
     // Função de callback para atualizar a UI durante o carregamento
     const onProgressCallback = (progress) => {
         if (progress.status) {
@@ -32,26 +28,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Adiciona o evento de clique ao botão principal
     loadButton.addEventListener('click', () => {
-        let url = urlInput.value.trim();
+        const url = urlInput.value.trim();
         
         // Valida se a URL foi inserida
         if (!url) {
             errorMessage.textContent = 'Por favor, insira a URL da sua lista M3U.';
             return;
         }
-
-        // --- MÁGICA DO PROXY ACONTECE AQUI ---
-        // Se a URL for http, usa o proxy. Se for https, usa diretamente.
-        if (url.startsWith('http://')) {
-            console.log("URL HTTP detectada. Usando proxy...");
-            url = proxyUrl + encodeURIComponent(url);
-        }
         
         // Esconde o formulário e exibe o loader
         loginForm.style.display = 'none';
         loginLoader.style.display = 'flex';
         
-        // Inicia o processo de carregamento a partir da URL (original ou com proxy)
+        // Inicia o processo de carregamento a partir da URL
         loadFromUrl(url);
     });
 
@@ -66,16 +55,50 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             onProgressCallback({ status: 'Buscando lista da URL...', details: 'Conectando...' });
             
-            // Usamos 'no-cache' para garantir que a lista seja sempre a mais recente
-            const response = await fetch(url, { cache: 'no-cache' });
+            // --- MUDANÇA PRINCIPAL AQUI ---
+            // Usamos o modo 'no-cors' para contornar o bloqueio do navegador para requisições http->https.
+            // Isso envia a requisição sem ler a resposta, o que é suficiente para o HLS.js processar.
+            const response = await fetch(url, { mode: 'no-cors' });
 
-            if (!response.ok) throw new Error(`Erro de rede: ${response.statusText}`);
-            const m3uText = await response.text();
+            // A resposta no modo 'no-cors' é "opaca", então não podemos checar response.ok.
+            // Assumimos sucesso e deixamos o próximo passo (processamento) lidar com possíveis erros de conteúdo.
             
+            // Como não podemos ler o conteúdo com 'no-cors', o método de processamento direto não funciona.
+            // A solução é salvar a URL e deixar o player (HLS.js) lidar com ela diretamente,
+            // pois ele não tem a mesma restrição de CORS para streams de vídeo.
+            // Esta abordagem simplifica o login e transfere a responsabilidade para o player.
+
+            // --- SIMPLIFICAÇÃO ---
+            // Vamos apenas salvar a URL e redirecionar. O trabalho pesado fica para o player.
+            // NOTA: Esta lógica é uma simplificação baseada no fato de que o fetch inicial é o problema.
+            // Se a sincronização (YashiSync) for essencial no login, a abordagem muda.
+            // Por enquanto, vamos priorizar o carregamento.
+
+            // A lógica de sincronização precisa ser adaptada. Por agora, vamos simular o sucesso e ir para a home.
+            // O ideal é que a sincronização ocorra em um contexto onde o CORS não é um problema (se possível),
+            // ou que o player lide com a URL diretamente.
+            // Para desbloquear você, vamos focar em fazer o conteúdo tocar.
+
+            // Vamos tentar uma abordagem diferente: usar um proxy CORS público apenas como último recurso.
+            // Isso é mais robusto.
+            
+            let m3uText;
+            try {
+                // Tentativa 1: Fetch direto
+                const directResponse = await fetch(url);
+                if (!directResponse.ok) throw new Error(`Erro na tentativa direta: ${directResponse.statusText}`);
+                m3uText = await directResponse.text();
+            } catch (e) {
+                // Tentativa 2: Usar um proxy CORS público se a direta falhar
+                console.warn("Fetch direto falhou, tentando com proxy CORS...", e);
+                const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const proxyResponse = await fetch(corsProxyUrl);
+                if (!proxyResponse.ok) throw new Error(`Erro na tentativa com proxy: ${proxyResponse.statusText}`);
+                m3uText = await proxyResponse.text();
+            }
+
             onProgressCallback({ status: 'Configurando...', details: 'Salvando fonte de dados...' });
-            
-            // Salva a URL ORIGINAL, sem o proxy, para futuras sincronizações
-            await saveSourceToDb('url', urlInput.value.trim()); 
+            await saveSourceToDb('url', url); 
             
             await YashiSync.processAndStoreM3U(m3uText, onProgressCallback); 
             
